@@ -7,9 +7,15 @@ export default defineComponent({
   data() {
     return {
       backgroundColor: store.state.backgroundColor,
+      gamepads: [] as Gamepad[],
     };
   },
   methods: {
+    updateGamepads() {
+      this.gamepads = Array.from(navigator.getGamepads()).filter(
+        (gp): gp is Gamepad => gp !== null
+      );
+    },
     onChangeBackgroundColor() {
       this.setBackGroundColor(this.backgroundColor);
     },
@@ -26,42 +32,74 @@ export default defineComponent({
       };
     },
   },
+  mounted() {
+    this.updateGamepads();
+    window.addEventListener("gamepadconnected", this.updateGamepads);
+    window.addEventListener("gamepaddisconnected", this.updateGamepads);
+  },
+  beforeUnmount() {
+    window.removeEventListener("gamepadconnected", this.updateGamepads);
+    window.removeEventListener("gamepaddisconnected", this.updateGamepads);
+  },
 });
 </script>
 
 <template>
   <div class="site-settings">
     <h1>表示設定</h1>
-    <h2 :style="backgroundColorCaptionStyle">入力履歴背景色</h2>
 
-    <div style="display: flex; align-items: center; gap: 10px">
-      <p>
-        <strong>背景色を選択してください</strong>
-      </p>
-      <input
-        type="color"
-        v-model="backgroundColor"
-        @change="onChangeBackgroundColor"
-      />
-    </div>
+    <fieldset>
+      <legend>
+        <h2 :style="backgroundColorCaptionStyle">入力履歴背景色</h2>
+      </legend>
 
-    <div style="display: flex; gap: 10px">
-      <p>プリセット</p>
       <div style="display: flex; align-items: center; gap: 10px">
+        <p>
+          <strong>背景色を選択してください</strong>
+        </p>
         <input
-          type="button"
-          value="White"
-          class="white-bg-button"
-          @click="setBackGroundColor('#ffffff')"
-        />
-        <input
-          type="button"
-          value="Green"
-          class="green-bg-button"
-          @click="setBackGroundColor('#00ff00')"
+          type="color"
+          v-model="backgroundColor"
+          @change="onChangeBackgroundColor"
         />
       </div>
-    </div>
+
+      <div style="display: flex; gap: 10px">
+        <p>プリセット</p>
+        <div style="display: flex; align-items: center; gap: 10px">
+          <input
+            type="button"
+            value="White"
+            class="white-bg-button"
+            @click="setBackGroundColor('#ffffff')"
+          />
+          <input
+            type="button"
+            value="Green"
+            class="green-bg-button"
+            @click="setBackGroundColor('#00ff00')"
+          />
+        </div>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>
+        <h2>ボタン設定</h2>
+      </legend>
+
+      <div>
+        <select>
+          <option
+            v-for="gamepad in gamepads"
+            :key="gamepad.id"
+            :value="gamepad.index"
+          >
+            {{ gamepad.id }}
+          </option>
+        </select>
+      </div>
+    </fieldset>
   </div>
 </template>
 

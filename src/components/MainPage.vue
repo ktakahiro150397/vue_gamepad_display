@@ -9,7 +9,7 @@ export default {
 </script>
 
 <template>
-  <div>
+  <div style="width: 500px">
     <SiteSettings />
   </div>
 </template>
