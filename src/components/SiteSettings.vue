@@ -2,7 +2,7 @@
 import { defineComponent } from "vue";
 import store from "@/store";
 import KeyInputPreview from "./KeyInputPreview.vue";
-import InputSettings from "./InputSettings.vue";
+import InputSettings from "./Settings/InputSettings.vue";
 
 export default defineComponent({
   name: "SiteSettings",

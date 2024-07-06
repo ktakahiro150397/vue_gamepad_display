@@ -2,10 +2,14 @@
 import { PropType, defineComponent } from "vue";
 import { DebugInfomation, GameLoop, GamepadKeyPressState } from "@/gameloop";
 import GamepadKeyInputInfo from "@/input-info";
+import ButtonPromptDropdown from "./ButtonPromptDropdown.vue";
 import store from "@/store";
 
 export default defineComponent({
   name: "InputSettings",
+  components: {
+    ButtonPromptDropdown,
+  },
   props: {
     gamepadId: {
       type: String as PropType<string>,
@@ -34,6 +38,16 @@ export default defineComponent({
         "border-radius": "5px",
         cursor: "pointer",
       };
+    },
+    onChangeButtonPrompt(
+      buttonIndex: number,
+      buttonPromptIndex: number,
+      selectedImageIndex: number,
+      selectedImageName: string
+    ) {
+      console.log(
+        `onChangeButtonPrompt: buttonIndex=${buttonIndex}, buttonPromptIndex=${buttonPromptIndex}, selectedImageIndex=${selectedImageIndex}, selectedImageName=${selectedImageName}`
+      );
     },
     onGameLoop(
       debugInfo: DebugInfomation,
@@ -97,10 +111,30 @@ export default defineComponent({
         <td>
           <p :style="gamepadButtonLabelStyle(inputInfo.button1)">Button 1</p>
         </td>
-        <td>A</td>
-        <td>B</td>
-        <td>C</td>
-        <td>D</td>
+        <td>
+          <ButtonPromptDropdown
+            :buttonIndex="0"
+            :buttonPromptIndex="0"
+            @changeDropdownImage="onChangeButtonPrompt"
+          />
+        </td>
+        <td>
+          <ButtonPromptDropdown
+            :buttonIndex="0"
+            :buttonPromptIndex="1"
+            @changeDropdownImage="onChangeButtonPrompt"
+          />
+        </td>
+        <td>
+          <ButtonPromptDropdown
+            :buttonIndex="0"
+            :buttonPromptIndex="2"
+            @changeDropdownImage="onChangeButtonPrompt"
+          />
+        </td>
+        <td>
+          <!-- <ButtonPromptDropdown :buttonIndex="0" :buttonPromptIndex="3" /> -->
+        </td>
       </tr>
       <tr>
         <td>

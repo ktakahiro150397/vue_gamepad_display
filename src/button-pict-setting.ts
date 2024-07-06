@@ -1,3 +1,12 @@
+export class DropdownImage {
+    public fileName: string;
+    public fileData: string;
+
+    constructor(fileName: string, fileData: string) {
+        this.fileName = fileName;
+        this.fileData = fileData;
+    }
+}
 
 export class ButtonPictSetting {
     public gamepadId = "";
