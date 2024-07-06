@@ -107,43 +107,30 @@ export default defineComponent({
       <th>方向キー</th>
     </thead>
     <tbody>
-      <tr>
+      <tr v-for="index_button in 16" :key="index_button">
         <td>
-          <p :style="gamepadButtonLabelStyle(inputInfo.button1)">Button 1</p>
+          <p
+            :style="
+              gamepadButtonLabelStyle(
+                inputInfo.buttonPressState(index_button - 1)
+              )
+            "
+          >
+            Button {{ index_button }}
+          </p>
         </td>
-        <td>
+
+        <td v-for="index_button_prompt in 3" :key="index_button_prompt">
           <ButtonPromptDropdown
-            :buttonIndex="0"
-            :buttonPromptIndex="0"
+            :buttonIndex="index_button"
+            :buttonPromptIndex="index_button_prompt"
             @changeDropdownImage="onChangeButtonPrompt"
           />
         </td>
+
         <td>
-          <ButtonPromptDropdown
-            :buttonIndex="0"
-            :buttonPromptIndex="1"
-            @changeDropdownImage="onChangeButtonPrompt"
-          />
+          <p>TBF</p>
         </td>
-        <td>
-          <ButtonPromptDropdown
-            :buttonIndex="0"
-            :buttonPromptIndex="2"
-            @changeDropdownImage="onChangeButtonPrompt"
-          />
-        </td>
-        <td>
-          <!-- <ButtonPromptDropdown :buttonIndex="0" :buttonPromptIndex="3" /> -->
-        </td>
-      </tr>
-      <tr>
-        <td>
-          <p :style="gamepadButtonLabelStyle(inputInfo.button2)">Button 2</p>
-        </td>
-        <td>A</td>
-        <td>B</td>
-        <td>C</td>
-        <td>D</td>
       </tr>
     </tbody>
   </table>

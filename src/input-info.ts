@@ -64,7 +64,7 @@ export default class GamepadKeyInputInfo {
         return this.buttonPressState(15);
     }
 
-    private buttonPressState(index: number): boolean {
+    public buttonPressState(index: number): boolean {
         if (this.buttonPressStates.length < index) {
             return false;
         }
