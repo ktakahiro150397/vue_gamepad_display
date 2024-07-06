@@ -19,6 +19,11 @@ export default defineComponent({
       required: false,
       default: "@/assets/button_prompt",
     },
+    initialValue: {
+      type: String,
+      required: false,
+      default: "",
+    },
   },
   data() {
     return {
@@ -73,6 +78,15 @@ export default defineComponent({
       const fileData = context(key);
       return new DropdownImage(fileName, fileData);
     });
+
+    // 初期値を設定
+    if (this.initialValue === "") {
+      this.selectedImageIndex = -1;
+    } else {
+      this.selectedImageIndex = this.dropdown_images.findIndex(
+        (image) => image.fileName === this.initialValue
+      );
+    }
   },
 });
 </script>

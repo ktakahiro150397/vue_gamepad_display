@@ -9,6 +9,11 @@ export default defineComponent({
       type: Number,
       required: true,
     },
+    initialValue: {
+      type: Number,
+      required: false,
+      default: -1,
+    },
   },
   data() {
     return {
@@ -31,6 +36,9 @@ export default defineComponent({
         this.selectedIndex
       );
     },
+  },
+  mounted() {
+    this.selectedIndex = this.initialValue;
   },
 });
 </script>
