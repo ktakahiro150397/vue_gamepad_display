@@ -1,13 +1,18 @@
 <script lang="tsx">
 import { defineComponent } from "vue";
 import store from "@/store";
+import KeyInputPreview from "./KeyInputPreview.vue";
 
 export default defineComponent({
   name: "SiteSettings",
+  components: {
+    KeyInputPreview,
+  },
   data() {
     return {
       backgroundColor: store.state.backgroundColor,
       gamepads: [] as Gamepad[],
+      selectedGamepadIndex: 0,
     };
   },
   methods: {
@@ -30,6 +35,17 @@ export default defineComponent({
       return {
         //backgroundColor: bgColor,
       };
+    },
+    selectedGamepadId(): string {
+      if (this.gamepads.length === 0) {
+        return "";
+      }
+
+      if (this.selectedGamepadIndex >= this.gamepads.length) {
+        return "";
+      }
+
+      return this.gamepads[this.selectedGamepadIndex].id;
     },
   },
   mounted() {
@@ -89,7 +105,7 @@ export default defineComponent({
       </legend>
 
       <div>
-        <select>
+        <select v-model="selectedGamepadIndex">
           <option
             v-for="gamepad in gamepads"
             :key="gamepad.id"
@@ -98,6 +114,10 @@ export default defineComponent({
             {{ gamepad.id }}
           </option>
         </select>
+      </div>
+
+      <div>
+        <KeyInputPreview :gamepadId="selectedGamepadId" />
       </div>
     </fieldset>
   </div>
