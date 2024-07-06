@@ -2,11 +2,13 @@
 import { defineComponent } from "vue";
 import store from "@/store";
 import KeyInputPreview from "./KeyInputPreview.vue";
+import InputSettings from "./InputSettings.vue";
 
 export default defineComponent({
   name: "SiteSettings",
   components: {
     KeyInputPreview,
+    InputSettings,
   },
   data() {
     return {
@@ -30,12 +32,6 @@ export default defineComponent({
     },
   },
   computed: {
-    backgroundColorCaptionStyle() {
-      //const bgColor = "#ffffff";
-      return {
-        //backgroundColor: bgColor,
-      };
-    },
     selectedGamepadId(): string {
       if (this.gamepads.length === 0) {
         return "";
@@ -66,7 +62,7 @@ export default defineComponent({
 
     <fieldset>
       <legend>
-        <h2 :style="backgroundColorCaptionStyle">入力履歴背景色</h2>
+        <h2>入力履歴背景色</h2>
       </legend>
 
       <div style="display: flex; align-items: center; gap: 10px">
@@ -117,6 +113,7 @@ export default defineComponent({
       </div>
 
       <div>
+        <InputSettings :gamepadId="selectedGamepadId" />
         <KeyInputPreview :gamepadId="selectedGamepadId" />
       </div>
     </fieldset>

@@ -3,6 +3,8 @@
   <!-- <HelloWorld
     msg="Welcome to Your Vue.js + TypeScript App / Running Vue CLI inside a container!"
   /> -->
+  <!-- <link rel="stylesheeet" href="/assets/image-selector/image-selector.css" />
+  <link rel="stylesheeet" href="/assets/image-selector/image-selector.js" /> -->
   <MainPage />
 </template>
 

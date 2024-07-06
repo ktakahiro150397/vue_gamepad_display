@@ -15,6 +15,7 @@ export default defineComponent({
     return {
       gamepads: [] as Gamepad[],
       inputInfo: new GamepadKeyInputInfo(),
+      debugInfo: new DebugInfomation(),
     };
   },
   methods: {
@@ -27,6 +28,8 @@ export default defineComponent({
       debugInfo: DebugInfomation,
       keyPressState: GamepadKeyPressState[]
     ) {
+      this.debugInfo = debugInfo;
+
       // 選択されているゲームパッドの入力情報を取得
       const selectedGamepad = keyPressState.find(
         (gp) => gp.gamepadId === this.gamepadId
@@ -46,7 +49,7 @@ export default defineComponent({
     window.addEventListener("gamepadconnected", this.updateGamepads);
     window.addEventListener("gamepaddisconnected", this.updateGamepads);
 
-    const gameLoop = new GameLoop();
+    const gameLoop = GameLoop.instance;
     gameLoop.executeGameLoop(this.onGameLoop);
   },
   beforeUnmount() {
@@ -58,6 +61,24 @@ export default defineComponent({
 
 <template>
   <h1>キー入力プレビュー</h1>
+
+  <table>
+    <tbody>
+      <tr>
+        <td>elapsedFrame</td>
+        <td>
+          <p>{{ debugInfo.elapsedFrame }}</p>
+        </td>
+      </tr>
+      <tr>
+        <td>elapsedTime</td>
+        <td>
+          <p>{{ debugInfo.elapsedTime.toFixed(0) }}</p>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
   <div>
     <p>{{ gamepadId }}</p>
     <p>buttonLength : {{ inputInfo.buttonLength }}</p>

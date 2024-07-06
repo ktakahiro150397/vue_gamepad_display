@@ -76,7 +76,7 @@ export class GameLoop {
     }
 
     public executeGameLoop(loopFunction: LoopFunction) {
-        let lastTime = 0
+        const lastTime = 0
 
         const fps = 60;
         const interval = 1000 / fps;
@@ -84,18 +84,21 @@ export class GameLoop {
         const gameLoop = (currentTime: number) => {
             const timeElapsed = currentTime - lastTime;
 
-            if (timeElapsed > interval) {
-                //GameLoop._debugInfo.elapsedFrame += 1
-                //GameLoop._debugInfo.elapsedTime += timeElapsed
+            GameLoop._debugInfo.elapsedFrame += 1
+            GameLoop._debugInfo.elapsedTime += timeElapsed
 
-                // TODO: Implement retrieve gamepad input
-                this.updateGamepadInputState();
+            // if (timeElapsed > interval) {
+            //     //console.log(GameLoop._debugInfo);
 
-                loopFunction(GameLoop._debugInfo, GameLoop._pressState)
-                lastTime = currentTime - (timeElapsed % interval);
-                requestAnimationFrame(gameLoop)
-            }
 
+
+            //     loopFunction(GameLoop._debugInfo, GameLoop._pressState)
+            //     lastTime = currentTime - (timeElapsed % interval);
+            //     requestAnimationFrame(gameLoop)
+            // }
+
+            this.updateGamepadInputState();
+            loopFunction(GameLoop._debugInfo, GameLoop._pressState)
             requestAnimationFrame(gameLoop)
         }
 
