@@ -3,12 +3,14 @@ import { PropType, defineComponent } from "vue";
 import { DebugInfomation, GameLoop, GamepadKeyPressState } from "@/gameloop";
 import GamepadKeyInputInfo from "@/input-info";
 import ButtonPromptDropdown from "./ButtonPromptDropdown.vue";
+import DirectionPromptDropdown from "./DirectionPromptDropdown.vue";
 import store from "@/store";
 
 export default defineComponent({
   name: "InputSettings",
   components: {
     ButtonPromptDropdown,
+    DirectionPromptDropdown,
   },
   props: {
     gamepadId: {
@@ -47,6 +49,14 @@ export default defineComponent({
     ) {
       console.log(
         `onChangeButtonPrompt: buttonIndex=${buttonIndex}, buttonPromptIndex=${buttonPromptIndex}, selectedImageIndex=${selectedImageIndex}, selectedImageName=${selectedImageName}`
+      );
+    },
+    onChangeDirectionPrompt(
+      buttonIndex: number,
+      selectedDirectionIndex: number
+    ) {
+      console.log(
+        `onChangeDirectionPrompt: buttonIndex=${buttonIndex}, selectedDirectionIndex=${selectedDirectionIndex}`
       );
     },
     onGameLoop(
@@ -129,7 +139,10 @@ export default defineComponent({
         </td>
 
         <td>
-          <p>TBF</p>
+          <DirectionPromptDropdown
+            :buttonIndex="index_button"
+            @changeDropdownDirection="onChangeDirectionPrompt"
+          />
         </td>
       </tr>
     </tbody>
