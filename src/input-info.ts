@@ -71,6 +71,25 @@ export default class GamepadKeyInputInfo {
         return this.buttonPressStates[index];
     }
 
+    public equals(other: GamepadKeyInputInfo): boolean {
+        return this.button1 === other.button1 &&
+            this.button2 === other.button2 &&
+            this.button3 === other.button3 &&
+            this.button4 === other.button4 &&
+            this.button5 === other.button5 &&
+            this.button6 === other.button6 &&
+            this.button7 === other.button7 &&
+            this.button8 === other.button8 &&
+            this.button9 === other.button9 &&
+            this.button10 === other.button10 &&
+            this.button11 === other.button11 &&
+            this.button12 === other.button12 &&
+            this.button13 === other.button13 &&
+            this.button14 === other.button14 &&
+            this.button15 === other.button15 &&
+            this.button16 === other.button16
+    }
+
     public buttonLength = 0;
     public buttonLayout: string[] = [];
     public buttonPressStates = [] as boolean[];
