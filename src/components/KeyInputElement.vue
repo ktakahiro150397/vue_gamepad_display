@@ -20,21 +20,49 @@ export default defineComponent({
     },
     initialFrameCount: {
       type: Number,
-      required: true,
+      required: false,
+      default: 1,
     },
     isFreeze: {
       type: Boolean,
       required: false,
       default: false,
     },
+    startFrameCount: {
+      type: Number,
+      required: false,
+      default: 0,
+    },
+    endFrameCount: {
+      type: Number,
+      required: false,
+      default: 0,
+    },
+  },
+  methods: {
+    onGameLoop(
+      debugInfo: DebugInfomation,
+      keyPressState: GamepadKeyPressState[]
+    ) {
+      if (!this.isFreeze) {
+        // 固定されていない場合、フレームカウントを更新
+        this.currentFrameCount += 1;
+      }
+    },
   },
   data() {
     return {
-      currentFrameCount: 99,
+      currentFrameCount: this.initialFrameCount,
     };
   },
+  watch: {
+    initialFrameCount() {
+      this.currentFrameCount = this.initialFrameCount;
+    },
+  },
   mounted() {
-    this.currentFrameCount = this.initialFrameCount;
+    const gameLoop = GameLoop.instance;
+    gameLoop.executeGameLoop(this.onGameLoop);
   },
 });
 </script>
@@ -58,6 +86,13 @@ export default defineComponent({
     </div>
     <div v-else>
       <p>ボタン未入力</p>
+    </div>
+
+    <div>
+      <p>isFreeze : {{ isFreeze }}</p>
+      <p>initialFrameCount : {{ initialFrameCount }}</p>
+      <p>startFrameCount : {{ startFrameCount }}</p>
+      <p>endFrameCount : {{ endFrameCount }}</p>
     </div>
   </div>
 </template>

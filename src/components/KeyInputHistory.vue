@@ -1,6 +1,5 @@
 <script lang="tsx">
 import { PropType, defineComponent } from "vue";
-import Vue from "vue";
 import { DebugInfomation, GameLoop, GamepadKeyPressState } from "@/gameloop";
 import GamepadKeyInputInfo from "@/input-info";
 import KeyInputElement from "./KeyInputElement.vue";
@@ -26,6 +25,8 @@ export default defineComponent({
 
       dropdown_images: [] as DropdownImage[],
       direction_image: [] as DropdownImage[],
+
+      test_value: 999,
     };
   },
   methods: {
@@ -33,6 +34,19 @@ export default defineComponent({
       this.gamepads = Array.from(navigator.getGamepads()).filter(
         (gp): gp is Gamepad => gp !== null
       );
+    },
+    generateDomId(): string {
+      const date = new Date();
+
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, "0");
+      const day = String(date.getDate()).padStart(2, "0");
+      const hours = String(date.getHours()).padStart(2, "0");
+      const minutes = String(date.getMinutes()).padStart(2, "0");
+      const seconds = String(date.getSeconds()).padStart(2, "0");
+      const milliseconds = String(date.getMilliseconds()).padStart(3, "0");
+
+      return `${year}${month}${day}${hours}${minutes}${seconds}${milliseconds}`;
     },
     onChangeGamepadSelection() {
       // 保存済みのボタン設定を取得
@@ -131,17 +145,21 @@ export default defineComponent({
       const options = {
         directionFileData: directionFileData,
         buttonFileData: buttonFileData,
-        initialFrameCount: 50,
+        initialFrameCount: 1,
         isFreeze: false,
+        domId: this.generateDomId(),
       };
 
-      // 先頭にプロパティを追加
+      // プロパティを末尾に追加
       this.inputHistoryPropertyList.unshift(options);
 
       // 制限数を超えている分を削除
       while (this.inputHistoryPropertyList.length > 10) {
         this.inputHistoryPropertyList.pop();
       }
+
+      //   console.log("Add input history");
+      //   console.log(this.inputHistoryPropertyList);
     },
     onGameLoop(
       debugInfo: DebugInfomation,
@@ -169,7 +187,30 @@ export default defineComponent({
 
       // 変化している場合、キー入力履歴を追加
       if (!this.inputInfo.equals(this.previoutInputInfo)) {
-        console.log("Input changed!");
+        for (var i = 0; i < this.inputHistoryPropertyList.length; i++) {
+          // 表示中のフレームカウントを固定
+          this.inputHistoryPropertyList[i].isFreeze = true;
+        }
+
+        var keyInputElements = this.$refs.keyInputElement as any;
+        if (
+          this.inputHistoryPropertyList.length > 0 &&
+          keyInputElements !== undefined &&
+          keyInputElements.length > 0
+        ) {
+          // 最新入力データのフレームカウントを更新
+          console.log("keyInputElements.length", keyInputElements.length);
+          console.log(
+            "Update latest initialFrameCount : ",
+            keyInputElements[keyInputElements.length - 1].currentFrameCount
+          );
+          console.log(keyInputElements);
+
+          this.inputHistoryPropertyList[0].initialFrameCount =
+            keyInputElements[keyInputElements.length - 1].currentFrameCount;
+          this.test_value--;
+        }
+
         this.addInputHistory();
       }
     },
@@ -247,14 +288,15 @@ export default defineComponent({
     <button @click="addInputHistory">履歴追加</button>
 
     <div
-      v-for="(inputHistoryProperty, index) in inputHistoryPropertyList"
-      :key="index"
+      v-for="inputHistoryProperty in inputHistoryPropertyList"
+      :key="inputHistoryProperty.domId"
     >
       <KeyInputElement
         :directionFileData="inputHistoryProperty['directionFileData']"
         :buttonFileData="inputHistoryProperty['buttonFileData']"
         :initialFrameCount="inputHistoryProperty['initialFrameCount']"
         :isFreeze="inputHistoryProperty['isFreeze']"
+        ref="keyInputElement"
       />
     </div>
   </div>
