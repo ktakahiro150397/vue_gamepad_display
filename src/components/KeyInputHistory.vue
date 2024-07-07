@@ -25,6 +25,7 @@ export default defineComponent({
       inputHistoryPropertyList: [] as any,
 
       dropdown_images: [] as DropdownImage[],
+      direction_image: [] as DropdownImage[],
     };
   },
   methods: {
@@ -51,11 +52,16 @@ export default defineComponent({
       // this.inputInfoから、キー入力履歴を追加
 
       var buttonFileData = [];
+      var isUp = false;
+      var isDown = false;
+      var isLeft = false;
+      var isRight = false;
 
+      // 押下されているボタンの確認
       for (var i = 0; i < 16; i++) {
         if (this.inputInfo.buttonPressState(i)) {
           // ボタンが押されている
-          // 対応する画像データを追加
+          // 対応するボタン画像データを追加
           for (var j = 0; j < 3; j++) {
             if (this.buttonPictSetting.settings[i].pictFileNames[j] !== "") {
               // ファイル名を取得
@@ -73,11 +79,57 @@ export default defineComponent({
               }
             }
           }
+
+          // 押下されている方向キーの確認
+          if (this.buttonPictSetting.settings[i].isDirectionalPad) {
+            // 方向キーが押されている
+            switch (this.buttonPictSetting.settings[i].directionalValue) {
+              case 0:
+                isUp = true;
+                break;
+              case 1:
+                isDown = true;
+                break;
+              case 2:
+                isLeft = true;
+                break;
+              case 3:
+                isRight = true;
+                break;
+            }
+          }
         }
       }
 
+      var directionFileData;
+      // 押下方向に応じて画像データを割り当て(テンキー方式のファイル順前提)
+      if (isDown) {
+        if (isLeft) {
+          directionFileData = this.direction_image[1 - 1].fileData;
+        } else if (isRight) {
+          directionFileData = this.direction_image[3 - 1].fileData;
+        } else {
+          directionFileData = this.direction_image[2 - 1].fileData;
+        }
+      } else if (isUp) {
+        if (isLeft) {
+          directionFileData = this.direction_image[7 - 1].fileData;
+        } else if (isRight) {
+          directionFileData = this.direction_image[9 - 1].fileData;
+        } else {
+          directionFileData = this.direction_image[8 - 1].fileData;
+        }
+      } else if (isLeft) {
+        directionFileData = this.direction_image[4 - 1].fileData;
+      } else if (isRight) {
+        directionFileData = this.direction_image[6 - 1].fileData;
+      } else {
+        // ニュートラル
+        directionFileData = this.direction_image[5 - 1].fileData;
+      }
+
       const options = {
-        directionFileData: "direction",
+        directionFileData: directionFileData,
         buttonFileData: buttonFileData,
         initialFrameCount: 50,
         isFreeze: false,
@@ -147,6 +199,20 @@ export default defineComponent({
     this.dropdown_images = context.keys().map((key) => {
       const fileName = key;
       const fileData = context(key);
+      return new DropdownImage(fileName, fileData);
+    });
+
+    // assets/button_promptディレクトリ内のpngファイルをインポート
+    const context_direction = require.context(
+      "@/assets/direction",
+      true,
+      /\.png$/
+    );
+
+    // インポートしたファイルのファイル名をdropdown_images配列に格納
+    this.direction_image = context_direction.keys().map((key) => {
+      const fileName = key;
+      const fileData = context_direction(key);
       return new DropdownImage(fileName, fileData);
     });
 
