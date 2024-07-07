@@ -40,6 +40,9 @@ export default defineComponent({
         this.buttonPromptIndex
       );
     },
+    selectedImageName(): string {
+      return this.getDropdownImageName(this.selectedImageIndex);
+    },
   },
   methods: {
     getDropdownImageData(index: number) {
@@ -67,6 +70,24 @@ export default defineComponent({
       );
     },
   },
+  watch: {
+    initialValue() {
+      // 初期値を設定
+      if (this.initialValue === "") {
+        this.selectedImageIndex = -1;
+      } else {
+        this.selectedImageIndex = this.dropdown_images.findIndex(
+          (image) => image.fileName === this.initialValue
+        );
+        console.log(
+          "<watch>Initial value : ",
+          this.initialValue,
+          " / selectedImageIndex : ",
+          this.selectedImageIndex
+        );
+      }
+    },
+  },
   mounted() {
     // 画面に表示するドロップダウンリストを作成
     // assets/button_promptディレクトリ内のpngファイルをインポート
@@ -85,6 +106,12 @@ export default defineComponent({
     } else {
       this.selectedImageIndex = this.dropdown_images.findIndex(
         (image) => image.fileName === this.initialValue
+      );
+      console.log(
+        "Initial value : ",
+        this.initialValue,
+        " / selectedImageIndex : ",
+        this.selectedImageIndex
       );
     }
   },

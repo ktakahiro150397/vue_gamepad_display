@@ -1,7 +1,11 @@
 import { createStore } from "vuex";
 import { ButtonPictSetting } from "./button-pict-setting";
+import createPersistedState from 'vuex-persistedstate'
 
 const store = createStore({
+    plugins: [createPersistedState({
+        key: "gamepad-display",
+    })],
     state() {
         return {
             backgroundColor: "#f0f0f0",
@@ -27,8 +31,20 @@ const store = createStore({
             const idx = state.buttonPictSettings.findIndex((bps: ButtonPictSetting) => bps.gamepadId === buttonPictSetting.gamepadId);
             if (idx >= 0) {
                 state.buttonPictSettings[idx] = buttonPictSetting;
+                console.log("setButtonPictSetting", buttonPictSetting.gamepadId, "Updated.");
             } else {
                 state.buttonPictSettings.push(buttonPictSetting);
+                console.log("setButtonPictSetting", buttonPictSetting.gamepadId, "Saved.");
+            }
+        }
+    },
+    getters: {
+        getButtonPictSetting: (state) => (gamepadId: string) => {
+            const idx = state.buttonPictSettings.findIndex((bps: ButtonPictSetting) => bps.gamepadId === gamepadId);
+            if (idx >= 0) {
+                return state.buttonPictSettings[idx];
+            } else {
+                return new ButtonPictSetting(gamepadId);
             }
         }
     }

@@ -7,8 +7,8 @@ import InputSettings from "./Settings/InputSettings.vue";
 export default defineComponent({
   name: "SiteSettings",
   components: {
-    KeyInputPreview,
     InputSettings,
+    // KeyInputPreview,
   },
   data() {
     return {
@@ -18,17 +18,21 @@ export default defineComponent({
     };
   },
   methods: {
-    updateGamepads() {
-      this.gamepads = Array.from(navigator.getGamepads()).filter(
-        (gp): gp is Gamepad => gp !== null
-      );
-    },
     onChangeBackgroundColor() {
       this.setBackGroundColor(this.backgroundColor);
+    },
+    onChangeGamepadSelection() {
+      console.log("onChangeGamepadSelection");
     },
     setBackGroundColor(color: string) {
       this.backgroundColor = color;
       store.commit("setBackgroundColor", color);
+    },
+    updateGamepads() {
+      this.gamepads = Array.from(navigator.getGamepads()).filter(
+        (gp): gp is Gamepad => gp !== null
+      );
+      this.onChangeGamepadSelection();
     },
   },
   computed: {
@@ -101,7 +105,10 @@ export default defineComponent({
       </legend>
 
       <div>
-        <select v-model="selectedGamepadIndex">
+        <select
+          v-model="selectedGamepadIndex"
+          @change="onChangeGamepadSelection"
+        >
           <option
             v-for="gamepad in gamepads"
             :key="gamepad.id"
@@ -114,7 +121,7 @@ export default defineComponent({
 
       <div>
         <InputSettings :gamepadId="selectedGamepadId" />
-        <KeyInputPreview :gamepadId="selectedGamepadId" />
+        <!-- <KeyInputPreview :gamepadId="selectedGamepadId" /> -->
       </div>
     </fieldset>
   </div>

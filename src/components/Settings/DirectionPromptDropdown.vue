@@ -24,6 +24,14 @@ export default defineComponent({
     dropdownHTMLId(): string {
       return "dropdown_directionPrompt-" + this.buttonIndex;
     },
+    selectedValue(): number {
+      return this.selectedIndex;
+    },
+  },
+  watch: {
+    initialValue() {
+      this.selectedIndex = this.initialValue;
+    },
   },
   methods: {
     onChangeDropdownDirection() {

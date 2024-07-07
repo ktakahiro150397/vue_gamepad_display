@@ -4,6 +4,7 @@ import { DebugInfomation, GameLoop, GamepadKeyPressState } from "@/gameloop";
 import GamepadKeyInputInfo from "@/input-info";
 import ButtonPromptDropdown from "./ButtonPromptDropdown.vue";
 import DirectionPromptDropdown from "./DirectionPromptDropdown.vue";
+import { ButtonPictSetting } from "@/button-pict-setting";
 import store from "@/store";
 
 export default defineComponent({
@@ -23,6 +24,7 @@ export default defineComponent({
       gamepads: [] as Gamepad[],
       selectedGamepadIndex: 0,
       inputInfo: new GamepadKeyInputInfo(),
+      buttonPictSetting: new ButtonPictSetting(this.gamepadId),
     };
   },
   methods: {
@@ -41,6 +43,36 @@ export default defineComponent({
         cursor: "pointer",
       };
     },
+    getCurrentSettingData(): ButtonPictSetting {
+      // 画面に入力されているボタンの設定内容を取得
+      this.buttonPictSetting.gamepadId = this.gamepadId;
+
+      // ボタン設定
+      var buttonDropdowns = this.$refs.buttonPromptDropdown as any;
+      var directionDropdowns = this.$refs.directionPromptDropdown as any;
+
+      for (var i = 0; i < 16; i++) {
+        // ボタン1-3の設定を取得
+        for (var j = 0; j < 3; j++) {
+          this.buttonPictSetting.settings[i].pictFileNames[j] =
+            buttonDropdowns[i * 3 + j].selectedImageName;
+        }
+
+        // 方向キーの設定を取得
+        const directionSelectedValue = directionDropdowns[i].selectedValue;
+        console.log("directionSelectedValue=" + directionSelectedValue);
+        if (directionSelectedValue == -1) {
+          this.buttonPictSetting.settings[i].isDirectionalPad = false;
+          this.buttonPictSetting.settings[i].directionalValue = -1;
+        } else {
+          this.buttonPictSetting.settings[i].isDirectionalPad = true;
+          this.buttonPictSetting.settings[i].directionalValue =
+            directionSelectedValue;
+        }
+      }
+
+      return this.buttonPictSetting;
+    },
     onChangeButtonPrompt(
       buttonIndex: number,
       buttonPromptIndex: number,
@@ -50,6 +82,10 @@ export default defineComponent({
       console.log(
         `onChangeButtonPrompt: buttonIndex=${buttonIndex}, buttonPromptIndex=${buttonPromptIndex}, selectedImageIndex=${selectedImageIndex}, selectedImageName=${selectedImageName}`
       );
+
+      // ボタンの設定内容を取得し、保存する
+      const currentSettingData = this.getCurrentSettingData();
+      store.commit("setButtonPictSetting", currentSettingData);
     },
     onChangeDirectionPrompt(
       buttonIndex: number,
@@ -58,6 +94,10 @@ export default defineComponent({
       console.log(
         `onChangeDirectionPrompt: buttonIndex=${buttonIndex}, selectedDirectionIndex=${selectedDirectionIndex}`
       );
+
+      // ボタンの設定内容を取得し、保存する
+      const currentSettingData = this.getCurrentSettingData();
+      store.commit("setButtonPictSetting", currentSettingData);
     },
     onGameLoop(
       debugInfo: DebugInfomation,
@@ -90,12 +130,35 @@ export default defineComponent({
       return this.gamepads[this.selectedGamepadIndex].id;
     },
   },
+  watch: {
+    gamepadId() {
+      // ゲームパッドの選択が変更されたときの処理
+
+      // 保存済みのボタン設定を取得
+      this.buttonPictSetting = store.getters.getButtonPictSetting(
+        this.gamepadId
+      );
+      console.log(
+        "<updateGamepad> Loaded buttonPictSetting. GamepadId : " +
+          this.buttonPictSetting.gamepadId
+      );
+      console.log(this.buttonPictSetting);
+    },
+  },
   mounted() {
     this.updateGamepads();
     window.addEventListener("gamepadconnected", this.updateGamepads);
     window.addEventListener("gamepaddisconnected", this.updateGamepads);
 
-    const gameLoop = new GameLoop();
+    // 保存済みのボタン設定を取得
+    this.buttonPictSetting = store.getters.getButtonPictSetting(this.gamepadId);
+    console.log(
+      "Loaded buttonPictSetting. GamepadId : " +
+        this.buttonPictSetting.gamepadId
+    );
+    console.log(this.buttonPictSetting);
+
+    const gameLoop = GameLoop.instance;
     gameLoop.executeGameLoop(this.onGameLoop);
   },
   beforeUnmount() {
@@ -134,15 +197,33 @@ export default defineComponent({
           <ButtonPromptDropdown
             :buttonIndex="index_button"
             :buttonPromptIndex="index_button_prompt"
+            :initialValue="
+              buttonPictSetting.settings[index_button - 1].pictFileNames[
+                index_button_prompt - 1
+              ]
+            "
             @changeDropdownImage="onChangeButtonPrompt"
-          />
+            ref="buttonPromptDropdown"
+          ></ButtonPromptDropdown>
+
+          {{
+            buttonPictSetting.settings[index_button - 1].pictFileNames[
+              index_button_prompt - 1
+            ]
+          }}
         </td>
 
         <td>
           <DirectionPromptDropdown
             :buttonIndex="index_button"
+            :initialValue="
+              buttonPictSetting.settings[index_button - 1].directionalValue
+            "
             @changeDropdownDirection="onChangeDirectionPrompt"
+            ref="directionPromptDropdown"
           />
+
+          {{ buttonPictSetting.settings[index_button - 1].directionalValue }}
         </td>
       </tr>
     </tbody>
