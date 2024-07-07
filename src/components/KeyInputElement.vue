@@ -84,16 +84,7 @@ export default defineComponent({
         :src="fileData"
       />
     </div>
-    <div v-else>
-      <p>ボタン未入力</p>
-    </div>
-
-    <div>
-      <p>isFreeze : {{ isFreeze }}</p>
-      <p>initialFrameCount : {{ initialFrameCount }}</p>
-      <p>startFrameCount : {{ startFrameCount }}</p>
-      <p>endFrameCount : {{ endFrameCount }}</p>
-    </div>
+    <div v-else></div>
   </div>
 </template>
 
