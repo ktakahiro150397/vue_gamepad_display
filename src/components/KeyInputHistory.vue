@@ -6,6 +6,7 @@ import KeyInputElement from "./KeyInputElement.vue";
 import { ButtonPictSetting } from "@/button-pict-setting";
 import { DropdownImage } from "@/button-pict-setting";
 import store from "@/store";
+import { Device, GetServerInfo } from "@/api/get-server-info";
 
 export default defineComponent({
   name: "KeyInputHistory",
@@ -15,7 +16,10 @@ export default defineComponent({
   data() {
     return {
       gamepads: [] as Gamepad[],
-      selectedGamepadIndex: "",
+      selectedGamepadId: "",
+
+      devices: [] as Device[],
+      selectedGamepadDevice: "",
 
       previoutInputInfo: new GamepadKeyInputInfo(),
       inputInfo: new GamepadKeyInputInfo(),
@@ -30,7 +34,11 @@ export default defineComponent({
     };
   },
   methods: {
-    updateGamepads() {
+    async updateGamepads() {
+      var data = await GetServerInfo.getDevices();
+
+      this.devices = data.devices;
+
       this.gamepads = Array.from(navigator.getGamepads()).filter(
         (gp): gp is Gamepad => gp !== null
       );
@@ -50,20 +58,31 @@ export default defineComponent({
     },
     onChangeGamepadSelection() {
       // 保存済みのボタン設定を取得
-      if (!(this.selectedGamepadIndex === "")) {
+      if (
+        !(this.selectedGamepadId === "" && this.selectedGamepadDevice === "")
+      ) {
         this.buttonPictSetting = store.getters.getButtonPictSetting(
-          this.gamepads[Number(this.selectedGamepadIndex)].id,
-          "TBF"
+          this.selectedGamepadId,
+          this.selectedGamepadDevice
         );
 
         console.log(
           "Loaded buttonPictSetting. GamepadId : " +
-            this.buttonPictSetting.gamepadId
+            this.buttonPictSetting.gamepadId +
+            " DeviceId : " +
+            this.buttonPictSetting.device_id
         );
         console.log(this.buttonPictSetting);
+
+        // TODO : 設定が更新された段階で、ストリームAPIからデータ取得を開始する
       }
     },
+    onChangeDeviceSelection() {
+      this.onChangeGamepadSelection();
+      console.log("onChangeDeviceSelection");
+    },
     addInputHistory() {
+      // TODO : APIからの戻り値からキー入力履歴を追加
       // this.inputInfoから、キー入力履歴を追加
 
       var buttonFileData = [];
@@ -162,59 +181,6 @@ export default defineComponent({
       //   console.log("Add input history");
       //   console.log(this.inputHistoryPropertyList);
     },
-    onGameLoop(
-      debugInfo: DebugInfomation,
-      keyPressState: GamepadKeyPressState[]
-    ) {
-      if (this.selectedGamepadIndex === "") {
-        return;
-      }
-      // 選択されているゲームパッドの入力情報を取得
-      const selectedGamepad = keyPressState.find(
-        (gp) =>
-          gp.gamepadId === this.gamepads[Number(this.selectedGamepadIndex)].id
-      );
-
-      if (selectedGamepad === undefined) {
-        // ゲームパッドが見つからない場合は何もしない
-        return;
-      }
-
-      // 前フレームの入力情報を退避
-      this.previoutInputInfo = this.inputInfo;
-
-      // このフレームのゲームパッド入力情報を取得
-      this.inputInfo = selectedGamepad.inputInfo;
-
-      // 変化している場合、キー入力履歴を追加
-      if (!this.inputInfo.equals(this.previoutInputInfo)) {
-        for (var i = 0; i < this.inputHistoryPropertyList.length; i++) {
-          // 表示中のフレームカウントを固定
-          this.inputHistoryPropertyList[i].isFreeze = true;
-        }
-
-        var keyInputElements = this.$refs.keyInputElement as any;
-        if (
-          this.inputHistoryPropertyList.length > 0 &&
-          keyInputElements !== undefined &&
-          keyInputElements.length > 0
-        ) {
-          // 最新入力データのフレームカウントを更新
-          console.log("keyInputElements.length", keyInputElements.length);
-          console.log(
-            "Update latest initialFrameCount : ",
-            keyInputElements[keyInputElements.length - 1].currentFrameCount
-          );
-          console.log(keyInputElements);
-
-          this.inputHistoryPropertyList[0].initialFrameCount =
-            keyInputElements[keyInputElements.length - 1].currentFrameCount;
-          this.test_value--;
-        }
-
-        this.addInputHistory();
-      }
-    },
   },
   mounted() {
     this.updateGamepads();
@@ -222,9 +188,9 @@ export default defineComponent({
     window.addEventListener("gamepaddisconnected", this.updateGamepads);
 
     // 保存済みのボタン設定を取得
-    if (!(this.selectedGamepadIndex === "")) {
+    if (!(this.selectedGamepadId === "")) {
       this.buttonPictSetting = store.getters.getButtonPictSetting(
-        this.gamepads[Number(this.selectedGamepadIndex)].id
+        this.gamepads[Number(this.selectedGamepadId)].id
       );
 
       console.log(
@@ -257,9 +223,6 @@ export default defineComponent({
       const fileData = context_direction(key);
       return new DropdownImage(fileName, fileData);
     });
-
-    const gameLoop = GameLoop.instance;
-    gameLoop.executeGameLoop(this.onGameLoop);
   },
   beforeUnmount() {
     window.removeEventListener("gamepadconnected", this.updateGamepads);
@@ -274,13 +237,23 @@ export default defineComponent({
   </div>
 
   <div>
-    <select v-model="selectedGamepadIndex" @change="onChangeGamepadSelection">
-      <option
-        v-for="gamepad in gamepads"
-        :key="gamepad.id"
-        :value="gamepad.index"
-      >
+    <p>ブラウザに接続されているゲームパッド</p>
+    <select v-model="selectedGamepadId" @change="onChangeGamepadSelection">
+      <option v-for="gamepad in gamepads" :key="gamepad.id" :value="gamepad.id">
         {{ gamepad.id }}
+      </option>
+    </select>
+  </div>
+
+  <div>
+    <p>Windowsに接続されているゲームパッド</p>
+    <select v-model="selectedGamepadDevice" @change="onChangeDeviceSelection">
+      <option
+        v-for="gamepad in devices"
+        :key="gamepad.device_id"
+        :value="gamepad.device_id"
+      >
+        {{ gamepad.device_name }}
       </option>
     </select>
   </div>
