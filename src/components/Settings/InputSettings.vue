@@ -18,13 +18,17 @@ export default defineComponent({
       type: String as PropType<string>,
       required: true,
     },
+    deviceId: {
+      type: String as PropType<string>,
+      required: true,
+    },
   },
   data() {
     return {
       gamepads: [] as Gamepad[],
       selectedGamepadIndex: 0,
       inputInfo: new GamepadKeyInputInfo(),
-      buttonPictSetting: new ButtonPictSetting(this.gamepadId),
+      buttonPictSetting: new ButtonPictSetting(this.gamepadId, this.deviceId),
     };
   },
   methods: {
@@ -46,6 +50,7 @@ export default defineComponent({
     getCurrentSettingData(): ButtonPictSetting {
       // 画面に入力されているボタンの設定内容を取得
       this.buttonPictSetting.gamepadId = this.gamepadId;
+      this.buttonPictSetting.device_id = this.deviceId;
 
       // ボタン設定
       var buttonDropdowns = this.$refs.buttonPromptDropdown as any;
@@ -136,7 +141,22 @@ export default defineComponent({
 
       // 保存済みのボタン設定を取得
       this.buttonPictSetting = store.getters.getButtonPictSetting(
-        this.gamepadId
+        this.gamepadId,
+        this.deviceId
+      );
+      console.log(
+        "<updateGamepad> Loaded buttonPictSetting. GamepadId : " +
+          this.buttonPictSetting.gamepadId
+      );
+      console.log(this.buttonPictSetting);
+    },
+    deviceId() {
+      // ゲームパッドの選択が変更されたときの処理
+
+      // 保存済みのボタン設定を取得
+      this.buttonPictSetting = store.getters.getButtonPictSetting(
+        this.gamepadId,
+        this.deviceId
       );
       console.log(
         "<updateGamepad> Loaded buttonPictSetting. GamepadId : " +
@@ -151,7 +171,10 @@ export default defineComponent({
     window.addEventListener("gamepaddisconnected", this.updateGamepads);
 
     // 保存済みのボタン設定を取得
-    this.buttonPictSetting = store.getters.getButtonPictSetting(this.gamepadId);
+    this.buttonPictSetting = store.getters.getButtonPictSetting(
+      this.gamepadId,
+      this.deviceId
+    );
     console.log(
       "Loaded buttonPictSetting. GamepadId : " +
         this.buttonPictSetting.gamepadId

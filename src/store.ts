@@ -46,12 +46,13 @@ const store = createStore({
         }
     },
     getters: {
-        getButtonPictSetting: (state) => (gamepadId: string) => {
-            const idx = state.buttonPictSettings.findIndex((bps: ButtonPictSetting) => bps.gamepadId === gamepadId);
+        getButtonPictSetting: (state) => (gamepadId: string, device_id: string) => {
+            const idx = state.buttonPictSettings.findIndex((bps: ButtonPictSetting) => bps.gamepadId === gamepadId && bps.device_id === device_id);
+            console.log("getButtonPictSetting", gamepadId, device_id, idx);
             if (idx >= 0) {
                 return state.buttonPictSettings[idx];
             } else {
-                return new ButtonPictSetting(gamepadId);
+                return new ButtonPictSetting(gamepadId, device_id);
             }
         }
     }

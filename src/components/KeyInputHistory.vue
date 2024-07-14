@@ -20,7 +20,7 @@ export default defineComponent({
       previoutInputInfo: new GamepadKeyInputInfo(),
       inputInfo: new GamepadKeyInputInfo(),
 
-      buttonPictSetting: new ButtonPictSetting(""),
+      buttonPictSetting: new ButtonPictSetting("", ""),
       inputHistoryPropertyList: [] as any,
 
       dropdown_images: [] as DropdownImage[],
@@ -52,7 +52,8 @@ export default defineComponent({
       // 保存済みのボタン設定を取得
       if (!(this.selectedGamepadIndex === "")) {
         this.buttonPictSetting = store.getters.getButtonPictSetting(
-          this.gamepads[Number(this.selectedGamepadIndex)].id
+          this.gamepads[Number(this.selectedGamepadIndex)].id,
+          "TBF"
         );
 
         console.log(
