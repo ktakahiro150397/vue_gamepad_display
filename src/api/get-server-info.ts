@@ -38,3 +38,16 @@ export class GetDevicesResponse {
         this.devices = devices;
     }
 }
+
+export class GetInputStreamResponse {
+    direction_state: number;
+    button_state: boolean[];
+    time_stamp: number;
+
+    constructor(direction_state: number, button_state: boolean[], time_stamp: number) {
+        this.direction_state = direction_state;
+        this.button_state = button_state;
+        this.time_stamp = time_stamp;
+    }
+
+}

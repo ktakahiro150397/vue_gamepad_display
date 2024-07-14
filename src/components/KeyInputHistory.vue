@@ -6,7 +6,11 @@ import KeyInputElement from "./KeyInputElement.vue";
 import { ButtonPictSetting } from "@/button-pict-setting";
 import { DropdownImage } from "@/button-pict-setting";
 import store from "@/store";
-import { Device, GetServerInfo } from "@/api/get-server-info";
+import {
+  Device,
+  GetInputStreamResponse,
+  GetServerInfo,
+} from "@/api/get-server-info";
 
 export default defineComponent({
   name: "KeyInputHistory",
@@ -30,7 +34,7 @@ export default defineComponent({
       dropdown_images: [] as DropdownImage[],
       direction_image: [] as DropdownImage[],
 
-      test_value: 999,
+      keyInputSource: null as EventSource | null,
     };
   },
   methods: {
@@ -74,12 +78,65 @@ export default defineComponent({
         );
         console.log(this.buttonPictSetting);
 
-        // TODO : 設定が更新された段階で、ストリームAPIからデータ取得を開始する
+        this.connectToGetInputStream();
       }
     },
     onChangeDeviceSelection() {
       this.onChangeGamepadSelection();
       console.log("onChangeDeviceSelection");
+    },
+    connectToGetInputStream() {
+      const selectedDeviceIndex = this.devices.findIndex(
+        (device) => device.device_id === this.selectedGamepadDevice
+      );
+      if (selectedDeviceIndex === -1) {
+        return;
+      }
+
+      const Url =
+        store.state.serverUrl +
+        "/GetInputStream?joyId=" +
+        this.devices[selectedDeviceIndex].joyId;
+      // フェッチ
+      this.keyInputSource = new EventSource(Url);
+      this.keyInputSource.addEventListener(
+        "message",
+        (event: any) => {
+          console.log(event.data);
+
+          // GetInputStreamResponseに変換
+          const parsed = JSON.parse(event.data);
+          const data = new GetInputStreamResponse(
+            parsed["direction_state"],
+            parsed["button_state"],
+            parsed["time_stamp"]
+          );
+          this.addInputHistoryFromStream(data);
+        },
+        false
+      );
+      console.log("Fetch url : " + Url);
+    },
+    addInputHistoryFromStream(data: GetInputStreamResponse) {
+      console.log("addInputHistoryFromStream called.");
+      console.log(data);
+
+      // キー入力履歴を追加
+
+      // 押下方向に応じて画像データを割り当て(テンキー方式のファイル順前提)
+      var directionFileData =
+        this.direction_image[data.direction_state - 1].fileData;
+
+      const options = {
+        directionFileData: directionFileData,
+        buttonFileData: [],
+        initialFrameCount: 1,
+        isFreeze: false,
+        domId: this.generateDomId(),
+      };
+
+      // プロパティを末尾に追加
+      this.inputHistoryPropertyList.unshift(options);
     },
     addInputHistory() {
       // TODO : APIからの戻り値からキー入力履歴を追加
@@ -227,6 +284,11 @@ export default defineComponent({
   beforeUnmount() {
     window.removeEventListener("gamepadconnected", this.updateGamepads);
     window.removeEventListener("gamepaddisconnected", this.updateGamepads);
+
+    // EventSourceの接続を閉じる
+    if (this.keyInputSource) {
+      this.keyInputSource.close();
+    }
   },
 });
 </script>
