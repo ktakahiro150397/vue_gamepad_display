@@ -11,6 +11,7 @@ const store = createStore({
             backgroundColor: "#f0f0f0",
             count: 0,
             buttonPictSettings: [] as ButtonPictSetting[],
+            serverUrl: "http://localhost:5000",
         }
     },
     mutations: {
@@ -35,6 +36,12 @@ const store = createStore({
             } else {
                 state.buttonPictSettings.push(buttonPictSetting);
                 console.log("setButtonPictSetting", buttonPictSetting.gamepadId, "Saved.");
+            }
+        },
+        setServerUrl(state: any, url: string) {
+            state.serverUrl = url;
+            if (process.env.NODE_ENV === "development") {
+                console.log("setServerUrl", url);
             }
         }
     },

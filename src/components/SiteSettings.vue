@@ -13,6 +13,7 @@ export default defineComponent({
   data() {
     return {
       backgroundColor: store.state.backgroundColor,
+      serverUrl: store.state.serverUrl,
       gamepads: [] as Gamepad[],
       selectedGamepadIndex: 0,
     };
@@ -23,6 +24,13 @@ export default defineComponent({
     },
     onChangeGamepadSelection() {
       console.log("onChangeGamepadSelection");
+    },
+    onChangeServerUrl() {
+      this.setServerUrl(this.serverUrl);
+    },
+    setServerUrl(url: string) {
+      this.serverUrl = url;
+      store.commit("setServerUrl", url);
     },
     setBackGroundColor(color: string) {
       this.backgroundColor = color;
@@ -63,6 +71,22 @@ export default defineComponent({
 <template>
   <div class="site-settings">
     <h1>表示設定</h1>
+
+    <fieldset>
+      <legend>
+        <h2>入力取得サーバーURL</h2>
+      </legend>
+
+      <div>
+        <p><strong>サーバーURL(http://localhost:5000 など)</strong></p>
+        <input
+          type="text"
+          v-model="serverUrl"
+          @change="onChangeServerUrl"
+          placeholder="http://localhost:5000"
+        />
+      </div>
+    </fieldset>
 
     <fieldset>
       <legend>
