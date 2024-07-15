@@ -361,35 +361,35 @@ export default defineComponent({
 </script>
 
 <template>
-  <div>
-    <p>キー入力履歴表示領域</p>
+  <div class="pad-selection-container">
+    <div>
+      <p>ブラウザに接続されているゲームパッド</p>
+      <select v-model="selectedGamepadId" @change="onChangeGamepadSelection">
+        <option
+          v-for="gamepad in gamepads"
+          :key="gamepad.id"
+          :value="gamepad.id"
+        >
+          {{ gamepad.id }}
+        </option>
+      </select>
+    </div>
+
+    <div>
+      <p>Windowsに接続されているゲームパッド</p>
+      <select v-model="selectedGamepadDevice" @change="onChangeDeviceSelection">
+        <option
+          v-for="gamepad in devices"
+          :key="gamepad.device_id"
+          :value="gamepad.device_id"
+        >
+          {{ gamepad.device_name }}
+        </option>
+      </select>
+    </div>
   </div>
 
-  <div>
-    <p>ブラウザに接続されているゲームパッド</p>
-    <select v-model="selectedGamepadId" @change="onChangeGamepadSelection">
-      <option v-for="gamepad in gamepads" :key="gamepad.id" :value="gamepad.id">
-        {{ gamepad.id }}
-      </option>
-    </select>
-  </div>
-
-  <div>
-    <p>Windowsに接続されているゲームパッド</p>
-    <select v-model="selectedGamepadDevice" @change="onChangeDeviceSelection">
-      <option
-        v-for="gamepad in devices"
-        :key="gamepad.device_id"
-        :value="gamepad.device_id"
-      >
-        {{ gamepad.device_name }}
-      </option>
-    </select>
-  </div>
-
-  <div id="input-history-area">
-    <button @click="addInputHistory">履歴追加</button>
-
+  <div id="input-history-area" style="margin-top: 20px">
     <div
       v-for="inputHistoryProperty in inputHistoryPropertyList"
       :key="inputHistoryProperty.domId"
@@ -406,4 +406,10 @@ export default defineComponent({
   </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+.pad-selection-container {
+  display: flex;
+  align-items: left;
+  gap: 20px;
+}
+</style>
