@@ -38,6 +38,11 @@ export default defineComponent({
       required: false,
       default: 0,
     },
+    backgroundColor: {
+      type: String,
+      required: false,
+      default: "#00ff00",
+    },
   },
   methods: {
     onGameLoop(
@@ -68,7 +73,7 @@ export default defineComponent({
 </script>
 
 <template>
-  <div class="keyinput-container">
+  <div class="keyinput-container" :style="{ backgroundColor: backgroundColor }">
     <div class="frame-count-container">
       <p class="frame-count">{{ currentFrameCount }}</p>
     </div>
@@ -93,7 +98,7 @@ export default defineComponent({
   display: flex;
   gap: 30px;
   align-items: center;
-  background-color: orange;
+  /* background-color: orange; */
 }
 
 .frame-count-container {

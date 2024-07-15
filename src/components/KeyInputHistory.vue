@@ -164,6 +164,7 @@ export default defineComponent({
         initialFrameCount: 1,
         isFreeze: false,
         domId: this.generateDomId(),
+        backgroudColor: store.state.backgroundColor,
       };
 
       // 既存のインスタンスのisFreezeをtrueにする
@@ -376,8 +377,11 @@ export default defineComponent({
         :buttonFileData="inputHistoryProperty['buttonFileData']"
         :initialFrameCount="inputHistoryProperty['initialFrameCount']"
         :isFreeze="inputHistoryProperty['isFreeze']"
+        :backgroundColor="inputHistoryProperty['backgroudColor']"
         ref="keyInputElement"
       />
     </div>
   </div>
 </template>
+
+<style scoped></style>
