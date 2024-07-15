@@ -118,8 +118,8 @@ export default defineComponent({
 }
 
 .keyinput-direction-img {
-  width: 24px;
-  height: 24px;
+  width: 32px;
+  height: 32px;
 }
 .keyinput-button-img {
   width: 38px;

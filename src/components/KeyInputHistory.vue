@@ -148,7 +148,7 @@ export default defineComponent({
         this.direction_image[data.direction_state - 1].fileData;
 
       // 押下されているボタンの確認
-      var buttonFileData = [] as string[];
+      var buttonFileDataList = [] as any;
       for (var i = 0; i < 16; i++) {
         if (data.button_state[i]) {
           // 対応するボタン画像データを取得
@@ -166,20 +166,30 @@ export default defineComponent({
               // 配列に追加
               if (
                 fileData !== undefined &&
-                !buttonFileData.includes(fileData)
+                !buttonFileDataList.some((e: any) => e.fileName === fileName)
               ) {
-                buttonFileData.push(fileData);
+                buttonFileDataList.push({
+                  fileName: fileName,
+                  fileData: fileData,
+                });
               }
             }
           }
         }
       }
       // ファイル名でソート
-      buttonFileData.sort();
+      buttonFileDataList.sort((a: any, b: any) => {
+        if (a.fileName < b.fileName) return -1;
+        if (a.fileName > b.fileName) return 1;
+        return 0;
+      });
+      console.log(buttonFileDataList);
 
       const options = {
         directionFileData: directionFileData,
-        buttonFileData: buttonFileData,
+        buttonFileData: buttonFileDataList.map(
+          (element: any) => element.fileData
+        ),
         initialFrameCount: 1,
         isFreeze: false,
         domId: this.generateDomId(),
