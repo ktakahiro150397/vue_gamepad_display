@@ -205,109 +205,9 @@ export default defineComponent({
       this.inputHistoryPropertyList.unshift(options);
 
       // 制限数を超えている分を削除
-      while (this.inputHistoryPropertyList.length > 30) {
+      while (this.inputHistoryPropertyList.length > 20) {
         this.inputHistoryPropertyList.pop();
       }
-    },
-    addInputHistory() {
-      // TODO : APIからの戻り値からキー入力履歴を追加
-      // this.inputInfoから、キー入力履歴を追加
-
-      var buttonFileData = [];
-      var isUp = false;
-      var isDown = false;
-      var isLeft = false;
-      var isRight = false;
-
-      // 押下されているボタンの確認
-      for (var i = 0; i < 16; i++) {
-        if (this.inputInfo.buttonPressState(i)) {
-          // ボタンが押されている
-          // 対応するボタン画像データを追加
-          for (var j = 0; j < 3; j++) {
-            if (this.buttonPictSetting.settings[i].pictFileNames[j] !== "") {
-              // ファイル名を取得
-              const fileName =
-                this.buttonPictSetting.settings[i].pictFileNames[j];
-
-              // 実ファイルデータを取得
-              const fileData = this.dropdown_images.find(
-                (image) => image.fileName === fileName
-              )?.fileData;
-
-              // 配列に追加
-              if (fileData !== undefined) {
-                buttonFileData.push(fileData);
-              }
-            }
-          }
-
-          // 押下されている方向キーの確認
-          if (this.buttonPictSetting.settings[i].isDirectionalPad) {
-            // 方向キーが押されている
-            switch (this.buttonPictSetting.settings[i].directionalValue) {
-              case 0:
-                isUp = true;
-                break;
-              case 1:
-                isDown = true;
-                break;
-              case 2:
-                isLeft = true;
-                break;
-              case 3:
-                isRight = true;
-                break;
-            }
-          }
-        }
-      }
-
-      var directionFileData;
-      // 押下方向に応じて画像データを割り当て(テンキー方式のファイル順前提)
-      if (isDown) {
-        if (isLeft) {
-          directionFileData = this.direction_image[1 - 1].fileData;
-        } else if (isRight) {
-          directionFileData = this.direction_image[3 - 1].fileData;
-        } else {
-          directionFileData = this.direction_image[2 - 1].fileData;
-        }
-      } else if (isUp) {
-        if (isLeft) {
-          directionFileData = this.direction_image[7 - 1].fileData;
-        } else if (isRight) {
-          directionFileData = this.direction_image[9 - 1].fileData;
-        } else {
-          directionFileData = this.direction_image[8 - 1].fileData;
-        }
-      } else if (isLeft) {
-        directionFileData = this.direction_image[4 - 1].fileData;
-      } else if (isRight) {
-        directionFileData = this.direction_image[6 - 1].fileData;
-      } else {
-        // ニュートラル
-        directionFileData = this.direction_image[5 - 1].fileData;
-      }
-
-      const options = {
-        directionFileData: directionFileData,
-        buttonFileData: buttonFileData,
-        initialFrameCount: 1,
-        isFreeze: false,
-        domId: this.generateDomId(),
-      };
-
-      // プロパティを末尾に追加
-      this.inputHistoryPropertyList.unshift(options);
-
-      // 制限数を超えている分を削除
-      while (this.inputHistoryPropertyList.length > 10) {
-        this.inputHistoryPropertyList.pop();
-      }
-
-      //   console.log("Add input history");
-      //   console.log(this.inputHistoryPropertyList);
     },
   },
   mounted() {
@@ -400,6 +300,8 @@ export default defineComponent({
   </div>
 
   <div id="input-history-area" style="margin-top: 20px">
+    <hr />
+
     <div
       v-for="inputHistoryProperty in inputHistoryPropertyList"
       :key="inputHistoryProperty.domId"
@@ -412,6 +314,7 @@ export default defineComponent({
         :backgroundColor="inputHistoryProperty['backgroudColor']"
         ref="keyInputElement"
       />
+      <hr />
     </div>
   </div>
 </template>
@@ -421,5 +324,10 @@ export default defineComponent({
   display: flex;
   align-items: left;
   gap: 20px;
+}
+
+.horizontal-line {
+  text-decoration: underline;
+  color: black;
 }
 </style>

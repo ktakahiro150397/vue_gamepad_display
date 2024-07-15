@@ -99,7 +99,7 @@ export default defineComponent({
 <style scoped>
 .keyinput-container {
   display: flex;
-  gap: 30px;
+  gap: 15px;
   align-items: center;
   margin: 0;
 }
@@ -128,7 +128,7 @@ export default defineComponent({
 
 .keyinput-button-cotainer {
   display: flex;
-  gap: 10px;
+  gap: 5px;
   align-items: center;
   /* background-color: violet; */
 }
