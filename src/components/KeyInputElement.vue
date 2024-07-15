@@ -49,7 +49,7 @@ export default defineComponent({
       debugInfo: DebugInfomation,
       keyPressState: GamepadKeyPressState[]
     ) {
-      if (!this.isFreeze) {
+      if (!this.isFreeze && this.currentFrameCount < 99) {
         // 固定されていない場合、フレームカウントを更新
         this.currentFrameCount += 1;
       }
