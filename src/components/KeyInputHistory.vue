@@ -134,7 +134,7 @@ export default defineComponent({
         this.direction_image[data.direction_state - 1].fileData;
 
       // 押下されているボタンの確認
-      var buttonFileData = [];
+      var buttonFileData = [] as string[];
       for (var i = 0; i < 16; i++) {
         if (data.button_state[i]) {
           // 対応するボタン画像データを取得
@@ -150,13 +150,18 @@ export default defineComponent({
               )?.fileData;
 
               // 配列に追加
-              if (fileData !== undefined) {
+              if (
+                fileData !== undefined &&
+                !buttonFileData.includes(fileData)
+              ) {
                 buttonFileData.push(fileData);
               }
             }
           }
         }
       }
+      // ファイル名でソート
+      buttonFileData.sort();
 
       const options = {
         directionFileData: directionFileData,
