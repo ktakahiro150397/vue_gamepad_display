@@ -1,5 +1,5 @@
 <script lang="tsx">
-import { PropType, defineComponent } from "vue";
+import { PropType, defineComponent, createApp } from "vue";
 import { DebugInfomation, GameLoop, GamepadKeyPressState } from "@/gameloop";
 import GamepadKeyInputInfo from "@/input-info";
 import KeyInputElement from "./KeyInputElement.vue";
@@ -117,6 +117,12 @@ export default defineComponent({
       );
       console.log("Fetch url : " + Url);
     },
+    onGameLoop(
+      debugInfo: DebugInfomation,
+      keyPressState: GamepadKeyPressState[]
+    ) {
+      return;
+    },
     addInputHistoryFromStream(data: GetInputStreamResponse) {
       console.log("addInputHistoryFromStream called.");
       console.log(data);
@@ -127,16 +133,51 @@ export default defineComponent({
       var directionFileData =
         this.direction_image[data.direction_state - 1].fileData;
 
+      // 押下されているボタンの確認
+      var buttonFileData = [];
+      for (var i = 0; i < 16; i++) {
+        if (data.button_state[i]) {
+          // 対応するボタン画像データを取得
+          for (var j = 0; j < 3; j++) {
+            if (this.buttonPictSetting.settings[i].pictFileNames[j] !== "") {
+              // ファイル名を取得
+              const fileName =
+                this.buttonPictSetting.settings[i].pictFileNames[j];
+
+              // 実ファイルデータを取得
+              const fileData = this.dropdown_images.find(
+                (image) => image.fileName === fileName
+              )?.fileData;
+
+              // 配列に追加
+              if (fileData !== undefined) {
+                buttonFileData.push(fileData);
+              }
+            }
+          }
+        }
+      }
+
       const options = {
         directionFileData: directionFileData,
-        buttonFileData: [],
+        buttonFileData: buttonFileData,
         initialFrameCount: 1,
         isFreeze: false,
         domId: this.generateDomId(),
       };
 
+      // 既存のインスタンスのisFreezeをtrueにする
+      this.inputHistoryPropertyList.forEach((element: any) => {
+        element.isFreeze = true;
+      });
+
       // プロパティを末尾に追加
       this.inputHistoryPropertyList.unshift(options);
+
+      // 制限数を超えている分を削除
+      while (this.inputHistoryPropertyList.length > 10) {
+        this.inputHistoryPropertyList.pop();
+      }
     },
     addInputHistory() {
       // TODO : APIからの戻り値からキー入力履歴を追加
@@ -280,6 +321,9 @@ export default defineComponent({
       const fileData = context_direction(key);
       return new DropdownImage(fileName, fileData);
     });
+
+    const gameLoop = GameLoop.instance;
+    gameLoop.executeGameLoop(this.onGameLoop);
   },
   beforeUnmount() {
     window.removeEventListener("gamepadconnected", this.updateGamepads);
