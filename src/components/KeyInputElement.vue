@@ -79,7 +79,9 @@ export default defineComponent({
     </div>
 
     <!-- 方向キー表示 -->
-    <img :src="directionFileData" />
+    <div>
+      <img :src="directionFileData" class="keyinput-direction-img" />
+    </div>
 
     <!-- ボタン表示 -->
     <div v-if="buttonFileData.length" class="keyinput-button-cotainer">
@@ -87,6 +89,7 @@ export default defineComponent({
         v-for="(fileData, index) in buttonFileData"
         :key="index"
         :src="fileData"
+        class="keyinput-button-img"
       />
     </div>
     <div v-else></div>
@@ -98,6 +101,7 @@ export default defineComponent({
   display: flex;
   gap: 30px;
   align-items: center;
+  margin: 0;
 }
 
 .frame-count-container {
@@ -113,7 +117,11 @@ export default defineComponent({
   font-size: 24px;
 }
 
-.keyinput-container img {
+.keyinput-direction-img {
+  width: 24px;
+  height: 24px;
+}
+.keyinput-button-img {
   width: 38px;
   height: 38px;
 }
