@@ -75,7 +75,7 @@ export default defineComponent({
 <template>
   <div class="keyinput-container" :style="{ backgroundColor: backgroundColor }">
     <div class="frame-count-container">
-      <p class="frame-count">{{ currentFrameCount }}</p>
+      <span class="frame-count">{{ currentFrameCount }}</span>
     </div>
 
     <!-- 方向キー表示 -->
@@ -98,27 +98,30 @@ export default defineComponent({
   display: flex;
   gap: 30px;
   align-items: center;
-  /* background-color: orange; */
 }
 
 .frame-count-container {
   min-width: 60px;
-  text-align: right;
+  height: 50px;
+
+  display: flex;
+  justify-content: right;
+  align-items: center;
 }
 
 .frame-count {
-  font-size: 28px;
+  font-size: 24px;
 }
 
 .keyinput-container img {
-  width: 48px;
-  height: 48px;
+  width: 38px;
+  height: 38px;
 }
 
 .keyinput-button-cotainer {
   display: flex;
   gap: 10px;
   align-items: center;
-  background-color: violet;
+  /* background-color: violet; */
 }
 </style>

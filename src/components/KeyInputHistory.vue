@@ -176,7 +176,7 @@ export default defineComponent({
       this.inputHistoryPropertyList.unshift(options);
 
       // 制限数を超えている分を削除
-      while (this.inputHistoryPropertyList.length > 10) {
+      while (this.inputHistoryPropertyList.length > 20) {
         this.inputHistoryPropertyList.pop();
       }
     },
