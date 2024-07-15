@@ -46,6 +46,15 @@ export default defineComponent({
       this.gamepads = Array.from(navigator.getGamepads()).filter(
         (gp): gp is Gamepad => gp !== null
       );
+
+      if (this.gamepads.length > 0) {
+        this.selectedGamepadId = this.gamepads[0].id;
+        this.onChangeGamepadSelection();
+      }
+      if (this.devices.length > 0) {
+        this.selectedGamepadDevice = this.devices[0].device_id;
+        this.onChangeDeviceSelection();
+      }
     },
     generateDomId(): string {
       const date = new Date();
@@ -91,6 +100,11 @@ export default defineComponent({
       );
       if (selectedDeviceIndex === -1) {
         return;
+      }
+
+      if (this.keyInputSource !== null) {
+        // 既存の接続を閉じる
+        this.keyInputSource.close();
       }
 
       const Url =
@@ -288,6 +302,9 @@ export default defineComponent({
   },
   mounted() {
     this.updateGamepads();
+    // 最初の要素を選択
+    console.log(this.gamepads);
+
     window.addEventListener("gamepadconnected", this.updateGamepads);
     window.addEventListener("gamepaddisconnected", this.updateGamepads);
 
