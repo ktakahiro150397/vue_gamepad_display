@@ -79,7 +79,7 @@ export default defineComponent({
     </div>
 
     <!-- 方向キー表示 -->
-    <div>
+    <div style="margin-right: 5px">
       <img :src="directionFileData" class="keyinput-direction-img" />
     </div>
 
@@ -99,14 +99,14 @@ export default defineComponent({
 <style scoped>
 .keyinput-container {
   display: flex;
-  gap: 15px;
   align-items: center;
   margin: 0;
 }
 
 .frame-count-container {
   min-width: 60px;
-  height: 50px;
+  height: 40px;
+  margin-right: 20px;
 
   display: flex;
   justify-content: right;
@@ -114,16 +114,23 @@ export default defineComponent({
 }
 
 .frame-count {
-  font-size: 24px;
+  /* font-family: "Meiryo", "MS PMincho", "HG創英角ﾎﾟｯﾌﾟ体", sans-serif; */
+  font-family: "RocknRoll One", "Train One", "IBM Plex Sans JP", sans-serif;
+
+  font-size: 28px;
+  font-weight: normal;
+  font-style: normal;
+  color: white;
+  /* -webkit-text-stroke: 1px #756f69; */
 }
 
 .keyinput-direction-img {
-  width: 32px;
-  height: 32px;
+  width: 28px;
+  height: 28px;
 }
 .keyinput-button-img {
-  width: 38px;
-  height: 38px;
+  width: 30px;
+  height: 30px;
 }
 
 .keyinput-button-cotainer {

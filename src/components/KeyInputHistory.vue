@@ -123,7 +123,8 @@ export default defineComponent({
           const data = new GetInputStreamResponse(
             parsed["direction_state"],
             parsed["button_state"],
-            parsed["time_stamp"]
+            parsed["time_stamp"],
+            parsed["previous_push_frame"]
           );
           this.addInputHistoryFromStream(data);
         },
@@ -200,6 +201,12 @@ export default defineComponent({
       this.inputHistoryPropertyList.forEach((element: any) => {
         element.isFreeze = true;
       });
+
+      // 直前の入力情報にフレーム数を設定
+      if (this.inputHistoryPropertyList.length > 0) {
+        this.inputHistoryPropertyList[0].initialFrameCount =
+          data.previous_push_frame;
+      }
 
       // プロパティを末尾に追加
       this.inputHistoryPropertyList.unshift(options);
@@ -300,7 +307,7 @@ export default defineComponent({
   </div>
 
   <div id="input-history-area" style="margin-top: 20px">
-    <hr />
+    <hr class="horizontal-line" />
 
     <div
       v-for="inputHistoryProperty in inputHistoryPropertyList"
@@ -314,7 +321,7 @@ export default defineComponent({
         :backgroundColor="inputHistoryProperty['backgroudColor']"
         ref="keyInputElement"
       />
-      <hr />
+      <hr class="horizontal-line" />
     </div>
   </div>
 </template>
@@ -327,7 +334,7 @@ export default defineComponent({
 }
 
 .horizontal-line {
-  text-decoration: underline;
-  color: black;
+  padding: 0;
+  margin: 0;
 }
 </style>

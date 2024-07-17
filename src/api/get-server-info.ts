@@ -43,11 +43,13 @@ export class GetInputStreamResponse {
     direction_state: number;
     button_state: boolean[];
     time_stamp: number;
+    previous_push_frame: number;
 
-    constructor(direction_state: number, button_state: boolean[], time_stamp: number) {
+    constructor(direction_state: number, button_state: boolean[], time_stamp: number, previous_push_frame: number) {
         this.direction_state = direction_state;
         this.button_state = button_state;
         this.time_stamp = time_stamp;
+        this.previous_push_frame = previous_push_frame;
     }
 
 }
