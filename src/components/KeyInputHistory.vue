@@ -297,12 +297,13 @@ export default defineComponent({
     </div>
   </div>
 
-  <div id="input-history-area" style="margin-top: 20px">
+  <div id="input-history-area" style="margin-top: 20px; display: flex">
     <hr class="horizontal-line" />
 
     <div
       v-for="inputHistoryProperty in inputHistoryPropertyList"
       :key="inputHistoryProperty.domId"
+      class="key-input-hyistory-container"
     >
       <KeyInputElement
         :directionFileData="inputHistoryProperty['directionFileData']"
@@ -322,6 +323,11 @@ export default defineComponent({
   display: flex;
   align-items: left;
   gap: 20px;
+}
+
+.key-input-hyistory-container {
+  background-color: orange;
+  width: 250px;
 }
 
 .horizontal-line {

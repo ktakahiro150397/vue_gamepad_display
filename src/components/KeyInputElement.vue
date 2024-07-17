@@ -101,6 +101,7 @@ export default defineComponent({
   display: flex;
   align-items: center;
   margin: 0;
+  background-color: orange;
 }
 
 .frame-count-container {
