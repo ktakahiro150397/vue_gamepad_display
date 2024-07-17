@@ -132,12 +132,6 @@ export default defineComponent({
       );
       console.log("Fetch url : " + Url);
     },
-    onGameLoop(
-      debugInfo: DebugInfomation,
-      keyPressState: GamepadKeyPressState[]
-    ) {
-      return;
-    },
     addInputHistoryFromStream(data: GetInputStreamResponse) {
       console.log("addInputHistoryFromStream called.");
       console.log(data);
@@ -261,9 +255,6 @@ export default defineComponent({
       const fileData = context_direction(key);
       return new DropdownImage(fileName, fileData);
     });
-
-    const gameLoop = GameLoop.instance;
-    gameLoop.executeGameLoop(this.onGameLoop);
   },
   beforeUnmount() {
     window.removeEventListener("gamepadconnected", this.updateGamepads);
