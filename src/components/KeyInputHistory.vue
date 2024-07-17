@@ -1,11 +1,16 @@
 <script lang="tsx">
-import { PropType, defineComponent } from "vue";
+import { PropType, defineComponent, createApp } from "vue";
 import { DebugInfomation, GameLoop, GamepadKeyPressState } from "@/gameloop";
 import GamepadKeyInputInfo from "@/input-info";
 import KeyInputElement from "./KeyInputElement.vue";
 import { ButtonPictSetting } from "@/button-pict-setting";
 import { DropdownImage } from "@/button-pict-setting";
 import store from "@/store";
+import {
+  Device,
+  GetInputStreamResponse,
+  GetServerInfo,
+} from "@/api/get-server-info";
 
 export default defineComponent({
   name: "KeyInputHistory",
@@ -15,25 +20,41 @@ export default defineComponent({
   data() {
     return {
       gamepads: [] as Gamepad[],
-      selectedGamepadIndex: "",
+      selectedGamepadId: "",
+
+      devices: [] as Device[],
+      selectedGamepadDevice: "",
 
       previoutInputInfo: new GamepadKeyInputInfo(),
       inputInfo: new GamepadKeyInputInfo(),
 
-      buttonPictSetting: new ButtonPictSetting(""),
+      buttonPictSetting: new ButtonPictSetting("", ""),
       inputHistoryPropertyList: [] as any,
 
       dropdown_images: [] as DropdownImage[],
       direction_image: [] as DropdownImage[],
 
-      test_value: 999,
+      keyInputSource: null as EventSource | null,
     };
   },
   methods: {
-    updateGamepads() {
+    async updateGamepads() {
+      var data = await GetServerInfo.getDevices();
+
+      this.devices = data.devices;
+
       this.gamepads = Array.from(navigator.getGamepads()).filter(
         (gp): gp is Gamepad => gp !== null
       );
+
+      if (this.gamepads.length > 0) {
+        this.selectedGamepadId = this.gamepads[0].id;
+        this.onChangeGamepadSelection();
+      }
+      if (this.devices.length > 0) {
+        this.selectedGamepadDevice = this.devices[0].device_id;
+        this.onChangeDeviceSelection();
+      }
     },
     generateDomId(): string {
       const date = new Date();
@@ -50,32 +71,82 @@ export default defineComponent({
     },
     onChangeGamepadSelection() {
       // 保存済みのボタン設定を取得
-      if (!(this.selectedGamepadIndex === "")) {
+      if (
+        !(this.selectedGamepadId === "" && this.selectedGamepadDevice === "")
+      ) {
         this.buttonPictSetting = store.getters.getButtonPictSetting(
-          this.gamepads[Number(this.selectedGamepadIndex)].id
+          this.selectedGamepadId,
+          this.selectedGamepadDevice
         );
 
         console.log(
           "Loaded buttonPictSetting. GamepadId : " +
-            this.buttonPictSetting.gamepadId
+            this.buttonPictSetting.gamepadId +
+            " DeviceId : " +
+            this.buttonPictSetting.device_id
         );
         console.log(this.buttonPictSetting);
+
+        this.connectToGetInputStream();
       }
     },
-    addInputHistory() {
-      // this.inputInfoから、キー入力履歴を追加
+    onChangeDeviceSelection() {
+      this.onChangeGamepadSelection();
+      console.log("onChangeDeviceSelection");
+    },
+    connectToGetInputStream() {
+      const selectedDeviceIndex = this.devices.findIndex(
+        (device) => device.device_id === this.selectedGamepadDevice
+      );
+      if (selectedDeviceIndex === -1) {
+        return;
+      }
 
-      var buttonFileData = [];
-      var isUp = false;
-      var isDown = false;
-      var isLeft = false;
-      var isRight = false;
+      if (this.keyInputSource !== null) {
+        // 既存の接続を閉じる
+        this.keyInputSource.close();
+      }
+
+      const Url =
+        store.state.serverUrl +
+        "/GetInputStream?joyId=" +
+        this.devices[selectedDeviceIndex].joyId;
+      // フェッチ
+      this.keyInputSource = new EventSource(Url);
+      this.keyInputSource.addEventListener(
+        "message",
+        (event: any) => {
+          console.log(event.data);
+
+          // GetInputStreamResponseに変換
+          const parsed = JSON.parse(event.data);
+          const data = new GetInputStreamResponse(
+            parsed["direction_state"],
+            parsed["button_state"],
+            parsed["time_stamp"],
+            parsed["previous_push_frame"]
+          );
+          this.addInputHistoryFromStream(data);
+        },
+        false
+      );
+      console.log("Fetch url : " + Url);
+    },
+    addInputHistoryFromStream(data: GetInputStreamResponse) {
+      console.log("addInputHistoryFromStream called.");
+      console.log(data);
+
+      // キー入力履歴を追加
+
+      // 押下方向に応じて画像データを割り当て(テンキー方式のファイル順前提)
+      var directionFileData =
+        this.direction_image[data.direction_state - 1].fileData;
 
       // 押下されているボタンの確認
+      var buttonFileDataList = [] as any;
       for (var i = 0; i < 16; i++) {
-        if (this.inputInfo.buttonPressState(i)) {
-          // ボタンが押されている
-          // 対応するボタン画像データを追加
+        if (data.button_state[i]) {
+          // 対応するボタン画像データを取得
           for (var j = 0; j < 3; j++) {
             if (this.buttonPictSetting.settings[i].pictFileNames[j] !== "") {
               // ファイル名を取得
@@ -88,142 +159,70 @@ export default defineComponent({
               )?.fileData;
 
               // 配列に追加
-              if (fileData !== undefined) {
-                buttonFileData.push(fileData);
+              if (
+                fileData !== undefined &&
+                !buttonFileDataList.some((e: any) => e.fileName === fileName)
+              ) {
+                buttonFileDataList.push({
+                  fileName: fileName,
+                  fileData: fileData,
+                });
               }
             }
           }
-
-          // 押下されている方向キーの確認
-          if (this.buttonPictSetting.settings[i].isDirectionalPad) {
-            // 方向キーが押されている
-            switch (this.buttonPictSetting.settings[i].directionalValue) {
-              case 0:
-                isUp = true;
-                break;
-              case 1:
-                isDown = true;
-                break;
-              case 2:
-                isLeft = true;
-                break;
-              case 3:
-                isRight = true;
-                break;
-            }
-          }
         }
       }
-
-      var directionFileData;
-      // 押下方向に応じて画像データを割り当て(テンキー方式のファイル順前提)
-      if (isDown) {
-        if (isLeft) {
-          directionFileData = this.direction_image[1 - 1].fileData;
-        } else if (isRight) {
-          directionFileData = this.direction_image[3 - 1].fileData;
-        } else {
-          directionFileData = this.direction_image[2 - 1].fileData;
-        }
-      } else if (isUp) {
-        if (isLeft) {
-          directionFileData = this.direction_image[7 - 1].fileData;
-        } else if (isRight) {
-          directionFileData = this.direction_image[9 - 1].fileData;
-        } else {
-          directionFileData = this.direction_image[8 - 1].fileData;
-        }
-      } else if (isLeft) {
-        directionFileData = this.direction_image[4 - 1].fileData;
-      } else if (isRight) {
-        directionFileData = this.direction_image[6 - 1].fileData;
-      } else {
-        // ニュートラル
-        directionFileData = this.direction_image[5 - 1].fileData;
-      }
+      // ファイル名でソート
+      buttonFileDataList.sort((a: any, b: any) => {
+        if (a.fileName < b.fileName) return -1;
+        if (a.fileName > b.fileName) return 1;
+        return 0;
+      });
+      console.log(buttonFileDataList);
 
       const options = {
         directionFileData: directionFileData,
-        buttonFileData: buttonFileData,
+        buttonFileData: buttonFileDataList.map(
+          (element: any) => element.fileData
+        ),
         initialFrameCount: 1,
         isFreeze: false,
         domId: this.generateDomId(),
+        backgroudColor: store.state.backgroundColor,
       };
+
+      // 既存のインスタンスのisFreezeをtrueにする
+      this.inputHistoryPropertyList.forEach((element: any) => {
+        element.isFreeze = true;
+      });
+
+      // 直前の入力情報にフレーム数を設定
+      if (this.inputHistoryPropertyList.length > 0) {
+        this.inputHistoryPropertyList[0].initialFrameCount =
+          data.previous_push_frame;
+      }
 
       // プロパティを末尾に追加
       this.inputHistoryPropertyList.unshift(options);
 
       // 制限数を超えている分を削除
-      while (this.inputHistoryPropertyList.length > 10) {
+      while (this.inputHistoryPropertyList.length > 20) {
         this.inputHistoryPropertyList.pop();
-      }
-
-      //   console.log("Add input history");
-      //   console.log(this.inputHistoryPropertyList);
-    },
-    onGameLoop(
-      debugInfo: DebugInfomation,
-      keyPressState: GamepadKeyPressState[]
-    ) {
-      if (this.selectedGamepadIndex === "") {
-        return;
-      }
-      // 選択されているゲームパッドの入力情報を取得
-      const selectedGamepad = keyPressState.find(
-        (gp) =>
-          gp.gamepadId === this.gamepads[Number(this.selectedGamepadIndex)].id
-      );
-
-      if (selectedGamepad === undefined) {
-        // ゲームパッドが見つからない場合は何もしない
-        return;
-      }
-
-      // 前フレームの入力情報を退避
-      this.previoutInputInfo = this.inputInfo;
-
-      // このフレームのゲームパッド入力情報を取得
-      this.inputInfo = selectedGamepad.inputInfo;
-
-      // 変化している場合、キー入力履歴を追加
-      if (!this.inputInfo.equals(this.previoutInputInfo)) {
-        for (var i = 0; i < this.inputHistoryPropertyList.length; i++) {
-          // 表示中のフレームカウントを固定
-          this.inputHistoryPropertyList[i].isFreeze = true;
-        }
-
-        var keyInputElements = this.$refs.keyInputElement as any;
-        if (
-          this.inputHistoryPropertyList.length > 0 &&
-          keyInputElements !== undefined &&
-          keyInputElements.length > 0
-        ) {
-          // 最新入力データのフレームカウントを更新
-          console.log("keyInputElements.length", keyInputElements.length);
-          console.log(
-            "Update latest initialFrameCount : ",
-            keyInputElements[keyInputElements.length - 1].currentFrameCount
-          );
-          console.log(keyInputElements);
-
-          this.inputHistoryPropertyList[0].initialFrameCount =
-            keyInputElements[keyInputElements.length - 1].currentFrameCount;
-          this.test_value--;
-        }
-
-        this.addInputHistory();
       }
     },
   },
   mounted() {
     this.updateGamepads();
+    // 最初の要素を選択
+    console.log(this.gamepads);
+
     window.addEventListener("gamepadconnected", this.updateGamepads);
     window.addEventListener("gamepaddisconnected", this.updateGamepads);
 
     // 保存済みのボタン設定を取得
-    if (!(this.selectedGamepadIndex === "")) {
+    if (!(this.selectedGamepadId === "")) {
       this.buttonPictSetting = store.getters.getButtonPictSetting(
-        this.gamepads[Number(this.selectedGamepadIndex)].id
+        this.gamepads[Number(this.selectedGamepadId)].id
       );
 
       console.log(
@@ -256,36 +255,50 @@ export default defineComponent({
       const fileData = context_direction(key);
       return new DropdownImage(fileName, fileData);
     });
-
-    const gameLoop = GameLoop.instance;
-    gameLoop.executeGameLoop(this.onGameLoop);
   },
   beforeUnmount() {
     window.removeEventListener("gamepadconnected", this.updateGamepads);
     window.removeEventListener("gamepaddisconnected", this.updateGamepads);
+
+    // EventSourceの接続を閉じる
+    if (this.keyInputSource) {
+      this.keyInputSource.close();
+    }
   },
 });
 </script>
 
 <template>
-  <div>
-    <p>キー入力履歴表示領域</p>
+  <div class="pad-selection-container">
+    <div>
+      <p>ブラウザに接続されているゲームパッド</p>
+      <select v-model="selectedGamepadId" @change="onChangeGamepadSelection">
+        <option
+          v-for="gamepad in gamepads"
+          :key="gamepad.id"
+          :value="gamepad.id"
+        >
+          {{ gamepad.id }}
+        </option>
+      </select>
+    </div>
+
+    <div>
+      <p>Windowsに接続されているゲームパッド</p>
+      <select v-model="selectedGamepadDevice" @change="onChangeDeviceSelection">
+        <option
+          v-for="gamepad in devices"
+          :key="gamepad.device_id"
+          :value="gamepad.device_id"
+        >
+          {{ gamepad.device_name }}
+        </option>
+      </select>
+    </div>
   </div>
 
-  <div>
-    <select v-model="selectedGamepadIndex" @change="onChangeGamepadSelection">
-      <option
-        v-for="gamepad in gamepads"
-        :key="gamepad.id"
-        :value="gamepad.index"
-      >
-        {{ gamepad.id }}
-      </option>
-    </select>
-  </div>
-
-  <div id="input-history-area">
-    <button @click="addInputHistory">履歴追加</button>
+  <div id="input-history-area" style="margin-top: 20px">
+    <hr class="horizontal-line" />
 
     <div
       v-for="inputHistoryProperty in inputHistoryPropertyList"
@@ -296,8 +309,23 @@ export default defineComponent({
         :buttonFileData="inputHistoryProperty['buttonFileData']"
         :initialFrameCount="inputHistoryProperty['initialFrameCount']"
         :isFreeze="inputHistoryProperty['isFreeze']"
+        :backgroundColor="inputHistoryProperty['backgroudColor']"
         ref="keyInputElement"
       />
+      <hr class="horizontal-line" />
     </div>
   </div>
 </template>
+
+<style scoped>
+.pad-selection-container {
+  display: flex;
+  align-items: left;
+  gap: 20px;
+}
+
+.horizontal-line {
+  padding: 0;
+  margin: 0;
+}
+</style>

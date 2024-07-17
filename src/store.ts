@@ -11,6 +11,7 @@ const store = createStore({
             backgroundColor: "#f0f0f0",
             count: 0,
             buttonPictSettings: [] as ButtonPictSetting[],
+            serverUrl: "http://localhost:5000",
         }
     },
     mutations: {
@@ -36,15 +37,22 @@ const store = createStore({
                 state.buttonPictSettings.push(buttonPictSetting);
                 console.log("setButtonPictSetting", buttonPictSetting.gamepadId, "Saved.");
             }
+        },
+        setServerUrl(state: any, url: string) {
+            state.serverUrl = url;
+            if (process.env.NODE_ENV === "development") {
+                console.log("setServerUrl", url);
+            }
         }
     },
     getters: {
-        getButtonPictSetting: (state) => (gamepadId: string) => {
-            const idx = state.buttonPictSettings.findIndex((bps: ButtonPictSetting) => bps.gamepadId === gamepadId);
+        getButtonPictSetting: (state) => (gamepadId: string, device_id: string) => {
+            const idx = state.buttonPictSettings.findIndex((bps: ButtonPictSetting) => bps.gamepadId === gamepadId && bps.device_id === device_id);
+            console.log("getButtonPictSetting", gamepadId, device_id, idx);
             if (idx >= 0) {
                 return state.buttonPictSettings[idx];
             } else {
-                return new ButtonPictSetting(gamepadId);
+                return new ButtonPictSetting(gamepadId, device_id);
             }
         }
     }

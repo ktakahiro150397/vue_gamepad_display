@@ -1,8 +1,12 @@
 <script lang="tsx">
 import { defineComponent } from "vue";
 import store from "@/store";
-import KeyInputPreview from "./KeyInputPreview.vue";
 import InputSettings from "./Settings/InputSettings.vue";
+import {
+  Device,
+  GetDevicesResponse,
+  GetServerInfo,
+} from "@/api/get-server-info";
 
 export default defineComponent({
   name: "SiteSettings",
@@ -13,8 +17,11 @@ export default defineComponent({
   data() {
     return {
       backgroundColor: store.state.backgroundColor,
+      serverUrl: store.state.serverUrl,
       gamepads: [] as Gamepad[],
-      selectedGamepadIndex: 0,
+      devices: [] as Device[],
+      selectedGamepadId: "",
+      selectedGamepadDevice: "",
     };
   },
   methods: {
@@ -24,11 +31,25 @@ export default defineComponent({
     onChangeGamepadSelection() {
       console.log("onChangeGamepadSelection");
     },
+    onChangeDeviceSelection() {
+      console.log("onChangeDeviceSelection");
+    },
+    onChangeServerUrl() {
+      this.setServerUrl(this.serverUrl);
+    },
+    setServerUrl(url: string) {
+      this.serverUrl = url;
+      store.commit("setServerUrl", url);
+    },
     setBackGroundColor(color: string) {
       this.backgroundColor = color;
       store.commit("setBackgroundColor", color);
     },
-    updateGamepads() {
+    async updateGamepads() {
+      var data = await GetServerInfo.getDevices();
+
+      this.devices = data.devices;
+
       this.gamepads = Array.from(navigator.getGamepads()).filter(
         (gp): gp is Gamepad => gp !== null
       );
@@ -36,17 +57,15 @@ export default defineComponent({
     },
   },
   computed: {
-    selectedGamepadId(): string {
-      if (this.gamepads.length === 0) {
-        return "";
-      }
-
-      if (this.selectedGamepadIndex >= this.gamepads.length) {
-        return "";
-      }
-
-      return this.gamepads[this.selectedGamepadIndex].id;
-    },
+    // currentSelectedGamepadId(): string {
+    //   if (this.gamepads.length === 0) {
+    //     return "";
+    //   }
+    //   if (this.selectedGamepadIndex >= this.gamepads.length) {
+    //     return "";
+    //   }
+    //   return this.gamepads[this.selectedGamepadIndex].id;
+    // },
   },
   mounted() {
     this.updateGamepads();
@@ -63,6 +82,22 @@ export default defineComponent({
 <template>
   <div class="site-settings">
     <h1>表示設定</h1>
+
+    <fieldset>
+      <legend>
+        <h2>入力取得サーバーURL</h2>
+      </legend>
+
+      <div>
+        <p><strong>サーバーURL(http://localhost:5000 など)</strong></p>
+        <input
+          type="text"
+          v-model="serverUrl"
+          @change="onChangeServerUrl"
+          placeholder="http://localhost:5000"
+        />
+      </div>
+    </fieldset>
 
     <fieldset>
       <legend>
@@ -105,22 +140,39 @@ export default defineComponent({
       </legend>
 
       <div>
-        <select
-          v-model="selectedGamepadIndex"
-          @change="onChangeGamepadSelection"
-        >
+        <p>ブラウザに接続されているゲームパッド</p>
+        <select v-model="selectedGamepadId" @change="onChangeGamepadSelection">
           <option
             v-for="gamepad in gamepads"
             :key="gamepad.id"
-            :value="gamepad.index"
+            :value="gamepad.id.toString()"
           >
             {{ gamepad.id }}
           </option>
         </select>
       </div>
 
+      <p>Windowsに接続されているゲームパッド</p>
       <div>
-        <InputSettings :gamepadId="selectedGamepadId" />
+        <select
+          v-model="selectedGamepadDevice"
+          @change="onChangeDeviceSelection"
+        >
+          <option
+            v-for="gamepad in devices"
+            :key="gamepad.device_id"
+            :value="gamepad.device_id"
+          >
+            {{ gamepad.device_name }}
+          </option>
+        </select>
+      </div>
+
+      <div>
+        <InputSettings
+          :gamepadId="selectedGamepadId"
+          :deviceId="selectedGamepadDevice"
+        />
         <!-- <KeyInputPreview :gamepadId="selectedGamepadId" /> -->
       </div>
     </fieldset>

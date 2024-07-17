@@ -44,11 +44,14 @@ export default {
   margin: 0;
   padding: 0;
   list-style-type: none;
+
+  display: flex;
 }
 
 /* タブの基本スタイル */
 .tabs-menu li {
   display: block;
+  width: fit-content;
 
   margin-right: 8px;
   margin-bottom: -1px;
