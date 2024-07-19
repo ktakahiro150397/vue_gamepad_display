@@ -122,6 +122,12 @@ export default defineComponent({
 
       // フェッチ
       this.keyInputSource = new EventSource(Url);
+      this.keyInputSource.addEventListener("error", (event: any) => {
+        console.log(event);
+        this.$toast.error(
+          "入力情報の取得に失敗しました。サーバーが起動していること、URLが正しいことを確認してください。"
+        );
+      });
       this.keyInputSource.addEventListener(
         "message",
         (event: any) => {
@@ -160,6 +166,12 @@ export default defineComponent({
         this.devices[selectedDeviceIndex].joyId;
       // フェッチ
       this.keyInputSource = new EventSource(Url);
+      this.keyInputSource.addEventListener("error", (event: any) => {
+        console.log(event);
+        this.$toast.error(
+          "入力情報の取得に失敗しました。サーバーが起動していること、URLが正しいことを確認してください。"
+        );
+      });
       this.keyInputSource.addEventListener(
         "message",
         (event: any) => {
