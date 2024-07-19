@@ -44,11 +44,23 @@ export default defineComponent({
     setBackGroundColor(color: string) {
       this.backgroundColor = color;
       store.commit("setBackgroundColor", color);
+      this.$toast.success("背景色を変更しました。");
     },
     async updateGamepads() {
-      var data = await GetServerInfo.getDevices();
+      try {
+        var data = await GetServerInfo.getDevices();
+        this.devices = data.devices;
+      } catch (error) {
+        // デバイス一覧の取得に失敗
+        console.log(error);
 
-      this.devices = data.devices;
+        this.$toast.open({
+          message:
+            "デバイス一覧の取得に失敗しました。サーバーが起動していること、URLが正しいことを確認してください。",
+          duration: 5 * 1000,
+          type: "error",
+        });
+      }
 
       this.gamepads = Array.from(navigator.getGamepads()).filter(
         (gp): gp is Gamepad => gp !== null
@@ -56,17 +68,7 @@ export default defineComponent({
       this.onChangeGamepadSelection();
     },
   },
-  computed: {
-    // currentSelectedGamepadId(): string {
-    //   if (this.gamepads.length === 0) {
-    //     return "";
-    //   }
-    //   if (this.selectedGamepadIndex >= this.gamepads.length) {
-    //     return "";
-    //   }
-    //   return this.gamepads[this.selectedGamepadIndex].id;
-    // },
-  },
+  computed: {},
   mounted() {
     this.updateGamepads();
     window.addEventListener("gamepadconnected", this.updateGamepads);

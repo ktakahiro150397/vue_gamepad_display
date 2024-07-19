@@ -1,6 +1,5 @@
 <script lang="tsx">
 import { PropType, defineComponent, createApp } from "vue";
-import { DebugInfomation, GameLoop, GamepadKeyPressState } from "@/gameloop";
 import GamepadKeyInputInfo from "@/input-info";
 import KeyInputElement from "./KeyInputElement.vue";
 import { ButtonPictSetting } from "@/button-pict-setting";
@@ -11,6 +10,9 @@ import {
   GetInputStreamResponse,
   GetServerInfo,
 } from "@/api/get-server-info";
+
+import { useToast } from "vue-toast-notification";
+import "vue-toast-notification/dist/theme-sugar.css";
 
 export default defineComponent({
   name: "KeyInputHistory",
@@ -39,9 +41,20 @@ export default defineComponent({
   },
   methods: {
     async updateGamepads() {
-      var data = await GetServerInfo.getDevices();
+      try {
+        var data = await GetServerInfo.getDevices();
+        this.devices = data.devices;
+      } catch (error) {
+        // デバイス一覧の取得に失敗
+        console.log(error);
 
-      this.devices = data.devices;
+        this.$toast.open({
+          message:
+            "デバイス一覧の取得に失敗しました。サーバーが起動していること、URLが正しいことを確認してください。",
+          duration: 5 * 1000,
+          type: "error",
+        });
+      }
 
       this.gamepads = Array.from(navigator.getGamepads()).filter(
         (gp): gp is Gamepad => gp !== null
