@@ -18,6 +18,7 @@ export default defineComponent({
     return {
       backgroundColor: store.state.backgroundColor,
       serverUrl: store.state.serverUrl,
+      isUseTestInputStream: store.state.isUseTestInputStream,
       gamepads: [] as Gamepad[],
       devices: [] as Device[],
       selectedGamepadId: "",
@@ -36,6 +37,12 @@ export default defineComponent({
     },
     onChangeServerUrl() {
       this.setServerUrl(this.serverUrl);
+    },
+    onChangeIsUseTestInputStream() {
+      this.setIsUseTestInputStream(this.isUseTestInputStream);
+    },
+    setIsUseTestInputStream(isUseTestInputStream: boolean) {
+      store.commit("setIsUseTestInputStream", isUseTestInputStream);
     },
     setServerUrl(url: string) {
       this.serverUrl = url;
@@ -89,7 +96,6 @@ export default defineComponent({
       <legend>
         <h2>入力取得サーバーURL</h2>
       </legend>
-
       <div>
         <p><strong>サーバーURL(http://localhost:5000 など)</strong></p>
         <input
@@ -98,6 +104,17 @@ export default defineComponent({
           @change="onChangeServerUrl"
           placeholder="http://localhost:5000"
         />
+      </div>
+      <div>
+        <input
+          id="chkIsUseTestInputStream"
+          type="checkbox"
+          v-model="isUseTestInputStream"
+          @change="onChangeIsUseTestInputStream"
+        />
+        <label for="chkIsUseTestInputStream"
+          >テスト用の入力ストリームを表示する</label
+        >
       </div>
     </fieldset>
 

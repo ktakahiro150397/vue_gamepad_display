@@ -12,6 +12,7 @@ const store = createStore({
             count: 0,
             buttonPictSettings: [] as ButtonPictSetting[],
             serverUrl: "http://localhost:5000",
+            isUseTestInputStream: false,
         }
     },
     mutations: {
@@ -42,6 +43,12 @@ const store = createStore({
             state.serverUrl = url;
             if (process.env.NODE_ENV === "development") {
                 console.log("setServerUrl", url);
+            }
+        },
+        setIsUseTestInputStream(state: any, isUseTestInputStream: boolean) {
+            state.isUseTestInputStream = isUseTestInputStream;
+            if (process.env.NODE_ENV === "development") {
+                console.log("setIsUseTestInputStream", isUseTestInputStream);
             }
         }
     },
