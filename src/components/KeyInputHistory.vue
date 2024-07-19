@@ -41,32 +41,39 @@ export default defineComponent({
   },
   methods: {
     async updateGamepads() {
-      try {
-        var data = await GetServerInfo.getDevices();
-        this.devices = data.devices;
-      } catch (error) {
-        // デバイス一覧の取得に失敗
-        console.log(error);
+      if (store.state.isUseTestInputStream) {
+        this.$toast.info(
+          "テスト用のランダムな入力情報を表示しています。この設定は「表示設定」から変更できます。"
+        );
+        this.connectToGetInputStreamTest();
+      } else {
+        try {
+          var data = await GetServerInfo.getDevices();
+          this.devices = data.devices;
+        } catch (error) {
+          // デバイス一覧の取得に失敗
+          console.log(error);
 
-        this.$toast.open({
-          message:
-            "デバイス一覧の取得に失敗しました。サーバーが起動していること、URLが正しいことを確認してください。",
-          duration: 5 * 1000,
-          type: "error",
-        });
-      }
+          this.$toast.open({
+            message:
+              "デバイス一覧の取得に失敗しました。サーバーが起動していること、URLが正しいことを確認してください。",
+            duration: 5 * 1000,
+            type: "error",
+          });
+        }
 
-      this.gamepads = Array.from(navigator.getGamepads()).filter(
-        (gp): gp is Gamepad => gp !== null
-      );
+        this.gamepads = Array.from(navigator.getGamepads()).filter(
+          (gp): gp is Gamepad => gp !== null
+        );
 
-      if (this.gamepads.length > 0) {
-        this.selectedGamepadId = this.gamepads[0].id;
-        this.onChangeGamepadSelection();
-      }
-      if (this.devices.length > 0) {
-        this.selectedGamepadDevice = this.devices[0].device_id;
-        this.onChangeDeviceSelection();
+        if (this.gamepads.length > 0) {
+          this.selectedGamepadId = this.gamepads[0].id;
+          this.onChangeGamepadSelection();
+        }
+        if (this.devices.length > 0) {
+          this.selectedGamepadDevice = this.devices[0].device_id;
+          this.onChangeDeviceSelection();
+        }
       }
     },
     generateDomId(): string {
@@ -106,6 +113,33 @@ export default defineComponent({
     onChangeDeviceSelection() {
       this.onChangeGamepadSelection();
       console.log("onChangeDeviceSelection");
+    },
+    connectToGetInputStreamTest() {
+      const Url =
+        store.state.serverUrl +
+        "/GetInputStreamTest?intervalTick=" +
+        store.state.testInputStreamFrameCount;
+
+      // フェッチ
+      this.keyInputSource = new EventSource(Url);
+      this.keyInputSource.addEventListener(
+        "message",
+        (event: any) => {
+          console.log(event.data);
+
+          // GetInputStreamResponseに変換
+          const parsed = JSON.parse(event.data);
+          const data = new GetInputStreamResponse(
+            parsed["direction_state"],
+            parsed["button_state"],
+            parsed["time_stamp"],
+            parsed["previous_push_frame"]
+          );
+          this.addInputHistoryFromStream(data);
+        },
+        false
+      );
+      console.log("Fetch url : " + Url);
     },
     connectToGetInputStream() {
       const selectedDeviceIndex = this.devices.findIndex(
@@ -243,6 +277,9 @@ export default defineComponent({
           this.buttonPictSetting.gamepadId
       );
       console.log(this.buttonPictSetting);
+    } else if (store.state.isUseTestInputStream) {
+      // テスト用のボタン設定を取得
+      this.buttonPictSetting = store.getters.getButtonPictSetting("", "");
     }
 
     // assets/button_promptディレクトリ内のpngファイルをインポート

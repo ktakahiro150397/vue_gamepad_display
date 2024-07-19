@@ -13,6 +13,7 @@ const store = createStore({
             buttonPictSettings: [] as ButtonPictSetting[],
             serverUrl: "http://localhost:5000",
             isUseTestInputStream: false,
+            testInputStreamFrameCount: 10,
         }
     },
     mutations: {
