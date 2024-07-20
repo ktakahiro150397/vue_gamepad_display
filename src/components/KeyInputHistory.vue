@@ -275,6 +275,11 @@ export default defineComponent({
       }
     },
   },
+  computed: {
+    backgroundColor() {
+      return store.state.backgroundColor;
+    },
+  },
   mounted() {
     this.updateGamepads();
     // 最初の要素を選択
@@ -338,72 +343,93 @@ export default defineComponent({
 </script>
 
 <template>
-  <div class="pad-selection-container">
-    <div>
-      <p>ブラウザに接続されているゲームパッド</p>
-      <select v-model="selectedGamepadId" @change="onChangeGamepadSelection">
-        <option
-          v-for="gamepad in gamepads"
-          :key="gamepad.id"
-          :value="gamepad.id"
+  <div class="container-fluid">
+    <div class="row mt-2">
+      <div class="col">
+        <div>
+          <label class="form-label">ブラウザに接続されているゲームパッド</label>
+          <select
+            class="form-select"
+            v-model="selectedGamepadId"
+            @change="onChangeGamepadSelection"
+          >
+            <option
+              v-for="gamepad in gamepads"
+              :key="gamepad.id"
+              :value="gamepad.id"
+            >
+              {{ gamepad.id }}
+            </option>
+          </select>
+        </div>
+      </div>
+
+      <div class="col">
+        <label class="form-label">Windowsに接続されているゲームパッド</label>
+        <select
+          class="form-select"
+          v-model="selectedGamepadDevice"
+          @change="onChangeDeviceSelection"
         >
-          {{ gamepad.id }}
-        </option>
-      </select>
-    </div>
+          <option
+            v-for="gamepad in devices"
+            :key="gamepad.device_id"
+            :value="gamepad.device_id"
+          >
+            {{ gamepad.device_name }}
+          </option>
+        </select>
+      </div>
 
-    <div>
-      <p>Windowsに接続されているゲームパッド</p>
-      <select v-model="selectedGamepadDevice" @change="onChangeDeviceSelection">
-        <option
-          v-for="gamepad in devices"
-          :key="gamepad.device_id"
-          :value="gamepad.device_id"
-        >
-          {{ gamepad.device_name }}
-        </option>
-      </select>
+      <div class="col">
+        <label class="form-label">プリセット名</label>
+        <p for="listPresetName">
+          <select
+            class="form-select"
+            v-model="selectedPresetName"
+            @change="onChangePresetSelection"
+          >
+            <option v-for="presetName in presetNames" :key="presetName">
+              {{ presetName }}
+            </option>
+          </select>
+        </p>
+      </div>
     </div>
-
-    <div>
-      <p for="listPresetName">プリセット名</p>
-      <select v-model="selectedPresetName" @change="onChangePresetSelection">
-        <option v-for="presetName in presetNames" :key="presetName">
-          {{ presetName }}
-        </option>
-      </select>
-    </div>
-  </div>
-
-  <div id="input-history-area" style="margin-top: 20px">
-    <hr class="horizontal-line" />
 
     <div
-      v-for="inputHistoryProperty in inputHistoryPropertyList"
-      :key="inputHistoryProperty.domId"
+      id="input-history-area"
+      class="input-history-area"
+      :style="{ backgroundColor: backgroundColor }"
     >
-      <KeyInputElement
-        :directionFileData="inputHistoryProperty['directionFileData']"
-        :buttonFileData="inputHistoryProperty['buttonFileData']"
-        :initialFrameCount="inputHistoryProperty['initialFrameCount']"
-        :isFreeze="inputHistoryProperty['isFreeze']"
-        :backgroundColor="inputHistoryProperty['backgroudColor']"
-        ref="keyInputElement"
-      />
       <hr class="horizontal-line" />
+
+      <div
+        v-for="inputHistoryProperty in inputHistoryPropertyList"
+        :key="inputHistoryProperty.domId"
+      >
+        <KeyInputElement
+          :directionFileData="inputHistoryProperty['directionFileData']"
+          :buttonFileData="inputHistoryProperty['buttonFileData']"
+          :initialFrameCount="inputHistoryProperty['initialFrameCount']"
+          :isFreeze="inputHistoryProperty['isFreeze']"
+          :backgroundColor="inputHistoryProperty['backgroudColor']"
+          ref="keyInputElement"
+        />
+        <hr class="horizontal-line" />
+      </div>
     </div>
   </div>
 </template>
 
 <style scoped>
-.pad-selection-container {
-  display: flex;
-  align-items: left;
-  gap: 20px;
-}
-
 .horizontal-line {
   padding: 0;
   margin: 0;
+}
+
+.input-history-area {
+  height: 90vh;
+  background-color: orange;
 }
 </style>

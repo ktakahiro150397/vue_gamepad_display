@@ -111,32 +111,38 @@ export default defineComponent({
 </script>
 
 <template>
-  <!-- {{ selectedImageIndex }} -->
-  <select
-    :id="dropdownHTMLId"
-    v-model="selectedImageIndex"
-    @change="onChangeDropdownImage"
-  >
-    <option value="-1">未選択</option>
-    <option
-      v-for="(image, index) in dropdown_images"
-      :key="image.fileName"
-      :value="index"
+  <div class="container d-grid d-flex gap-1 align-items-center">
+    <select
+      :id="dropdownHTMLId"
+      class="form-select"
+      v-model="selectedImageIndex"
+      @change="onChangeDropdownImage"
     >
-      {{ image.fileName }}
-    </option>
-  </select>
+      <option value="-1">未選択</option>
+      <option
+        v-for="(image, index) in dropdown_images"
+        :key="image.fileName"
+        :value="index"
+      >
+        {{ image.fileName }}
+      </option>
+    </select>
 
-  <img
-    v-if="selectedImageIndex >= 0"
-    :src="getDropdownImageData(selectedImageIndex)"
-    class="dropdown-buttonPrompt-img"
-    alt="button_prompt"
-  />
+    <div>
+      <img
+        v-if="selectedImageIndex >= 0"
+        :src="getDropdownImageData(selectedImageIndex)"
+        class="dropdown-buttonPrompt-img"
+        alt="button_prompt"
+      />
+      <div v-else class="dropdown-buttonPrompt-img" />
+    </div>
+  </div>
 </template>
 
 <style scoped>
 .dropdown-buttonPrompt-img {
   width: 32px;
+  height: 32px;
 }
 </style>
