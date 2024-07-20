@@ -1,29 +1,15 @@
-# vue_gamepad_display
+# ボタン表示設定
 
-## Project setup
-```
-npm install
-```
+## キー項目
 
-### Compiles and hot-reloads for development
-```
-npm run serve
-```
+ - ブラウザ側のゲームパッドID
+ - Windows側のデバイスID
+ - プリセット名称
 
-### Compiles and minifies for production
-```
-npm run build
-```
+## タスク
 
-### Run your unit tests
-```
-npm run test:unit
-```
+ - プリセット名の入力
+ - プリセット名の選択
+ →ドロップダウン・テキストボックスが一つになっているものを使う？
 
-### Lints and fixes files
-```
-npm run lint
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+ 

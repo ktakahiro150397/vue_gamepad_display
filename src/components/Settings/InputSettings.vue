@@ -14,6 +14,10 @@ export default defineComponent({
     DirectionPromptDropdown,
   },
   props: {
+    presetName: {
+      type: String as PropType<string>,
+      required: true,
+    },
     gamepadId: {
       type: String as PropType<string>,
       required: true,
@@ -28,7 +32,11 @@ export default defineComponent({
       gamepads: [] as Gamepad[],
       selectedGamepadIndex: 0,
       inputInfo: new GamepadKeyInputInfo(),
-      buttonPictSetting: new ButtonPictSetting(this.gamepadId, this.deviceId),
+      buttonPictSetting: new ButtonPictSetting(
+        this.presetName,
+        this.gamepadId,
+        this.deviceId
+      ),
     };
   },
   methods: {

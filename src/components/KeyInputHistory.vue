@@ -30,7 +30,7 @@ export default defineComponent({
       previoutInputInfo: new GamepadKeyInputInfo(),
       inputInfo: new GamepadKeyInputInfo(),
 
-      buttonPictSetting: new ButtonPictSetting("", ""),
+      buttonPictSetting: new ButtonPictSetting("", "", ""),
       inputHistoryPropertyList: [] as any,
 
       dropdown_images: [] as DropdownImage[],

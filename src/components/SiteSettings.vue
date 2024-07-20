@@ -21,6 +21,7 @@ export default defineComponent({
       isUseTestInputStream: store.state.isUseTestInputStream,
       gamepads: [] as Gamepad[],
       devices: [] as Device[],
+      selectedPresetName: "",
       selectedGamepadId: "",
       selectedGamepadDevice: "",
     };
@@ -189,6 +190,7 @@ export default defineComponent({
 
       <div>
         <InputSettings
+          :selectedPresetName="selectedPresetName"
           :gamepadId="selectedGamepadId"
           :deviceId="selectedGamepadDevice"
         />
