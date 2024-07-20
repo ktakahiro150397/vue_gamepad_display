@@ -50,7 +50,6 @@ export default defineComponent({
     },
     onDeleteButtonSetting() {
       // ボタン設定の削除ボタン押下イベント
-      console.log("onDeleteButtonSetting");
       this.selectedPresetName = "";
       this.setPresetNameList();
     },

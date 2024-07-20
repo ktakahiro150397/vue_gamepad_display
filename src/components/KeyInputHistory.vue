@@ -108,21 +108,11 @@ export default defineComponent({
           this.selectedGamepadId,
           this.selectedGamepadDevice
         );
-
-        console.log(
-          "Loaded buttonPictSetting. GamepadId : " +
-            this.buttonPictSetting.gamepadId +
-            " DeviceId : " +
-            this.buttonPictSetting.device_id
-        );
-        console.log(this.buttonPictSetting);
-
         this.connectToGetInputStream();
       }
     },
     onChangeDeviceSelection() {
       this.onChangeGamepadSelection();
-      console.log("onChangeDeviceSelection");
     },
     onChangePresetSelection() {
       this.onChangeGamepadSelection();
@@ -147,7 +137,7 @@ export default defineComponent({
       // フェッチ
       this.keyInputSource = new EventSource(Url);
       this.keyInputSource.addEventListener("error", (event: any) => {
-        console.log(event);
+        console.error(event);
         this.$toast.error(
           "入力情報の取得に失敗しました。サーバーが起動していること、URLが正しいことを確認してください。"
         );
@@ -288,8 +278,6 @@ export default defineComponent({
   mounted() {
     this.updateGamepads();
     // 最初の要素を選択
-    console.log(this.gamepads);
-
     window.addEventListener("gamepadconnected", this.updateGamepads);
     window.addEventListener("gamepaddisconnected", this.updateGamepads);
 
@@ -299,11 +287,6 @@ export default defineComponent({
         this.selectedPresetName,
         this.selectedGamepadId,
         this.selectedGamepadDevice
-      );
-
-      console.log(
-        "Loaded buttonPictSetting. GamepadId : " +
-          this.buttonPictSetting.gamepadId
       );
 
       this.setPresetNameList();

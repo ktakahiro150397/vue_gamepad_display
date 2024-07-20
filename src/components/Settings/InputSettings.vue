@@ -89,8 +89,6 @@ export default defineComponent({
     },
     onClickDeleteButton() {
       // 現在のプリセットを削除する
-      console.log("onClickDeleteButton");
-
       if (
         window.confirm(
           "プリセット名「" +
@@ -156,11 +154,6 @@ export default defineComponent({
         this.gamepadId,
         this.deviceId
       );
-      console.log(
-        "<updateGamepad> Loaded buttonPictSetting. GamepadId : " +
-          this.buttonPictSetting.gamepadId
-      );
-      console.log(this.buttonPictSetting);
     },
     gamepadId() {
       // ゲームパッドの選択が変更されたときの処理
@@ -171,11 +164,6 @@ export default defineComponent({
         this.gamepadId,
         this.deviceId
       );
-      console.log(
-        "<updateGamepad> Loaded buttonPictSetting. GamepadId : " +
-          this.buttonPictSetting.gamepadId
-      );
-      console.log(this.buttonPictSetting);
     },
     deviceId() {
       // ゲームパッドの選択が変更されたときの処理
@@ -186,11 +174,6 @@ export default defineComponent({
         this.gamepadId,
         this.deviceId
       );
-      console.log(
-        "<updateGamepad> Loaded buttonPictSetting. GamepadId : " +
-          this.buttonPictSetting.gamepadId
-      );
-      console.log(this.buttonPictSetting);
     },
   },
   mounted() {
@@ -203,11 +186,6 @@ export default defineComponent({
       this.gamepadId,
       this.deviceId
     );
-    console.log(
-      "Loaded buttonPictSetting. GamepadId : " +
-        this.buttonPictSetting.gamepadId
-    );
-    console.log(this.buttonPictSetting);
 
     const gameLoop = GameLoop.instance;
     gameLoop.executeGameLoop(this.onGameLoop);

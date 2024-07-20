@@ -59,8 +59,6 @@ export default defineComponent({
     },
     onChangeDropdownImage() {
       // ドロップダウンリストの選択が変更されたときの処理
-      console.log("onChangeDropdownImage");
-
       this.$emit(
         "changeDropdownImage",
         this.buttonIndex,
@@ -78,12 +76,6 @@ export default defineComponent({
       } else {
         this.selectedImageIndex = this.dropdown_images.findIndex(
           (image) => image.fileName === this.initialValue
-        );
-        console.log(
-          "<watch>Initial value : ",
-          this.initialValue,
-          " / selectedImageIndex : ",
-          this.selectedImageIndex
         );
       }
     },
