@@ -27,6 +27,9 @@ export default defineComponent({
       devices: [] as Device[],
       selectedGamepadDevice: "",
 
+      presetNames: [] as string[],
+      selectedPresetName: "",
+
       previoutInputInfo: new GamepadKeyInputInfo(),
       inputInfo: new GamepadKeyInputInfo(),
 
@@ -74,6 +77,10 @@ export default defineComponent({
           this.selectedGamepadDevice = this.devices[0].device_id;
           this.onChangeDeviceSelection();
         }
+        if (this.presetNames.length > 0) {
+          this.selectedPresetName = this.presetNames[0];
+          this.onChangePresetSelection();
+        }
       }
     },
     generateDomId(): string {
@@ -90,11 +97,14 @@ export default defineComponent({
       return `${year}${month}${day}${hours}${minutes}${seconds}${milliseconds}`;
     },
     onChangeGamepadSelection() {
+      this.setPresetNameList();
+
       // 保存済みのボタン設定を取得
       if (
         !(this.selectedGamepadId === "" && this.selectedGamepadDevice === "")
       ) {
         this.buttonPictSetting = store.getters.getButtonPictSetting(
+          this.selectedPresetName,
           this.selectedGamepadId,
           this.selectedGamepadDevice
         );
@@ -113,6 +123,20 @@ export default defineComponent({
     onChangeDeviceSelection() {
       this.onChangeGamepadSelection();
       console.log("onChangeDeviceSelection");
+    },
+    onChangePresetSelection() {
+      this.onChangeGamepadSelection();
+    },
+    setPresetNameList() {
+      // 選択されたゲームパッドに対応するプリセット名を名称の昇順で取得
+      this.presetNames = store.state.buttonPictSettings
+        .filter(
+          (setting: any) =>
+            setting.gamepadId === this.selectedGamepadId &&
+            setting.device_id === this.selectedGamepadDevice
+        )
+        .map((setting: any) => setting.presetName)
+        .sort();
     },
     connectToGetInputStreamTest() {
       const Url =
@@ -272,14 +296,17 @@ export default defineComponent({
     // 保存済みのボタン設定を取得
     if (!(this.selectedGamepadId === "")) {
       this.buttonPictSetting = store.getters.getButtonPictSetting(
-        this.gamepads[Number(this.selectedGamepadId)].id
+        this.selectedPresetName,
+        this.selectedGamepadId,
+        this.selectedGamepadDevice
       );
 
       console.log(
         "Loaded buttonPictSetting. GamepadId : " +
           this.buttonPictSetting.gamepadId
       );
-      console.log(this.buttonPictSetting);
+
+      this.setPresetNameList();
     } else if (store.state.isUseTestInputStream) {
       // テスト用のボタン設定を取得
       this.buttonPictSetting = store.getters.getButtonPictSetting(
@@ -287,6 +314,8 @@ export default defineComponent({
         "",
         ""
       );
+
+      this.setPresetNameList();
     }
 
     // assets/button_promptディレクトリ内のpngファイルをインポート
@@ -349,6 +378,15 @@ export default defineComponent({
           :value="gamepad.device_id"
         >
           {{ gamepad.device_name }}
+        </option>
+      </select>
+    </div>
+
+    <div>
+      <p for="listPresetName">プリセット名</p>
+      <select v-model="selectedPresetName" @change="onChangePresetSelection">
+        <option v-for="presetName in presetNames" :key="presetName">
+          {{ presetName }}
         </option>
       </select>
     </div>
