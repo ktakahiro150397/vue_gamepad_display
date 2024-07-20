@@ -200,8 +200,24 @@ export default defineComponent({
 <template>
   <h1>ボタン表示設定</h1>
 
-  <input type="button" value="設定を保存" @click="onClickSaveButton" />
-  <input type="button" value="設定を削除" @click="onClickDeleteButton" />
+  <div class="container d-grid gap-2 d-md-flex justify-content-md-end">
+    <button
+      type="button"
+      value="設定を保存"
+      @click="onClickSaveButton"
+      class="btn btn-primary col-2"
+    >
+      保存
+    </button>
+    <button
+      type="button"
+      value="設定を削除"
+      @click="onClickDeleteButton"
+      class="btn btn-danger"
+    >
+      削除
+    </button>
+  </div>
 
   <table>
     <thead>
