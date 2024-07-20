@@ -10,6 +10,7 @@ import { useToast } from "vue-toast-notification";
 
 export default defineComponent({
   name: "InputSettings",
+  emits: ["onSaveButtonSetting", "onDeleteButtonSetting"],
   components: {
     ButtonPromptDropdown,
     DirectionPromptDropdown,
@@ -100,6 +101,34 @@ export default defineComponent({
       );
 
       this.$emit("onSaveButtonSetting");
+    },
+    onClickDeleteButton() {
+      // 現在のプリセットを削除する
+      console.log("onClickDeleteButton");
+
+      if (
+        window.confirm(
+          "プリセット名「" +
+            this.presetName +
+            "」のボタン表示設定を削除しますか？"
+        ) == false
+      ) {
+        return;
+      }
+
+      store.commit("deleteButtonPictSetting", {
+        presetName: this.presetName,
+        gamepadId: this.gamepadId,
+        device_id: this.deviceId,
+      });
+
+      this.$toast.warning(
+        "プリセット名「" +
+          this.presetName +
+          "」のボタン表示設定を削除しました。"
+      );
+
+      this.$emit("onDeleteButtonSetting");
     },
     onGameLoop(
       debugInfo: DebugInfomation,
@@ -209,6 +238,7 @@ export default defineComponent({
   <h1>ボタン表示設定</h1>
 
   <input type="button" value="設定を保存" @click="onClickSaveButton" />
+  <input type="button" value="設定を削除" @click="onClickDeleteButton" />
 
   <table>
     <thead>

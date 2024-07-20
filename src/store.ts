@@ -40,6 +40,16 @@ const store = createStore({
                 console.log("setButtonPictSetting", buttonPictSetting.gamepadId, "Saved.");
             }
         },
+        deleteButtonPictSetting(state: any, payload: { presetName: string, gamepadId: string, device_id: string }) {
+            console.log("deleteButtonPictSetting", payload.presetName, payload.gamepadId, payload.device_id);
+            const idx = state.buttonPictSettings.findIndex((bps: ButtonPictSetting) => bps.presetName === payload.presetName && bps.gamepadId === payload.gamepadId && bps.device_id === payload.device_id);
+            if (idx >= 0) {
+                state.buttonPictSettings.splice(idx, 1);
+                console.log("deleteButtonPictSetting", payload.gamepadId, "Deleted.");
+            } else {
+                console.log("deleteButtonPictSetting", payload.gamepadId, "Not found.");
+            }
+        },
         setServerUrl(state: any, url: string) {
             state.serverUrl = url;
             if (process.env.NODE_ENV === "development") {

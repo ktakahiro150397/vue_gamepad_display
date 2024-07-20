@@ -48,6 +48,12 @@ export default defineComponent({
       // ボタン設定の保存ボタン押下イベント
       this.setPresetNameList();
     },
+    onDeleteButtonSetting() {
+      // ボタン設定の削除ボタン押下イベント
+      console.log("onDeleteButtonSetting");
+      this.selectedPresetName = "";
+      this.setPresetNameList();
+    },
     setIsUseTestInputStream(isUseTestInputStream: boolean) {
       store.commit("setIsUseTestInputStream", isUseTestInputStream);
     },
@@ -229,6 +235,7 @@ export default defineComponent({
           :gamepadId="selectedGamepadId"
           :deviceId="selectedGamepadDevice"
           @onSaveButtonSetting="onSaveButtonSetting"
+          @onDeleteButtonSetting="onDeleteButtonSetting"
         />
       </div>
     </fieldset>
