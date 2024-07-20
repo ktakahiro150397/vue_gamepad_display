@@ -112,76 +112,99 @@ export default defineComponent({
 </script>
 
 <template>
-  <div class="site-settings">
-    <h1>表示設定</h1>
+  <div class="container mt-3">
+    <div class="card mb-3">
+      <div class="card-header">サーバー設定</div>
+      <div class="card-body">
+        <div class="mb-3 row">
+          <div class="col">
+            <label class="form-label">入力取得サーバーURL</label>
 
-    <fieldset>
-      <legend>
-        <h2>入力取得サーバーURL</h2>
-      </legend>
-      <div>
-        <p><strong>サーバーURL(http://localhost:5000 など)</strong></p>
-        <input
-          type="text"
-          v-model="serverUrl"
-          @change="onChangeServerUrl"
-          placeholder="http://localhost:5000"
-        />
-      </div>
-      <div>
-        <input
-          id="chkIsUseTestInputStream"
-          type="checkbox"
-          v-model="isUseTestInputStream"
-          @change="onChangeIsUseTestInputStream"
-        />
-        <label for="chkIsUseTestInputStream"
-          >テスト用の入力ストリームを表示する</label
-        >
-      </div>
-    </fieldset>
+            <div class="row">
+              <div class="col">
+                <input
+                  type="text"
+                  class="form-control"
+                  v-model="serverUrl"
+                  @change="onChangeServerUrl"
+                  placeholder="http://localhost:5000"
+                />
+                <span class="form-text">
+                  入力取得を行うサーバーのURLを入力してください。デフォルトは「http://localhost:5000」です。
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
 
-    <fieldset>
-      <legend>
-        <h2>入力履歴背景色</h2>
-      </legend>
-
-      <div style="display: flex; align-items: center; gap: 10px">
-        <p>
-          <strong>背景色を選択してください</strong>
-        </p>
-        <input
-          type="color"
-          v-model="backgroundColor"
-          @change="onChangeBackgroundColor"
-        />
-      </div>
-
-      <div style="display: flex; gap: 10px">
-        <p>プリセット</p>
-        <div style="display: flex; align-items: center; gap: 10px">
-          <input
-            type="button"
-            value="White"
-            style="background-color: #ffffff; color: black"
-            @click="setBackGroundColor('#ffffff')"
-          />
-          <input
-            type="button"
-            value="Green"
-            style="background-color: #00ff00; color: black"
-            @click="setBackGroundColor('#00ff00')"
-          />
-
-          <input
-            type="button"
-            value="Brown"
-            style="background-color: #552200; color: white"
-            @click="setBackGroundColor('#552200')"
-          />
+        <div class="row">
+          <div class="col">
+            <div class="form-switch">
+              <input
+                id="chkIsUseTestInputStream"
+                type="checkbox"
+                class="form-check-input"
+                v-model="isUseTestInputStream"
+                @change="onChangeIsUseTestInputStream"
+              />
+              <label for="chkIsUseTestInputStream" class="form-check-label ms-2"
+                >テスト用の入力ストリームを表示する</label
+              >
+            </div>
+            <span class="form-text">
+              実際の入力ではなく、ランダムな入力をサーバーから取得して表示します。(動作確認向け)
+            </span>
+          </div>
         </div>
       </div>
-    </fieldset>
+    </div>
+
+    <div class="card mb-3">
+      <div class="card-header">入力履歴背景色</div>
+      <div class="card-body">
+        <div class="mb-3 row">
+          <div class="col">
+            <label class="form-label">入力履歴背景色</label>
+            <input
+              type="color"
+              class="form-control form-control-color"
+              v-model="backgroundColor"
+              @change="onChangeBackgroundColor"
+            />
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col">
+            <label class="form-label col-12">背景色プリセット</label>
+            <button
+              type="button"
+              class="btn btn-color-preset me-2"
+              style="color: black"
+              @click="setBackGroundColor('#ffffff')"
+            >
+              Whilte(#FFFFFF)
+            </button>
+            <button
+              type="button"
+              class="btn btn-color-preset me-2"
+              style="background-color: #00ff00"
+              @click="setBackGroundColor('#00ff00')"
+            >
+              Green(#00FF00)
+            </button>
+            <button
+              type="button"
+              class="btn btn-color-preset"
+              style="background-color: #552200; color: white"
+              @click="setBackGroundColor('#552200')"
+            >
+              Brown(#552200)
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <fieldset>
       <legend>
@@ -249,6 +272,10 @@ export default defineComponent({
 </template>
 
 <style scoped>
+.btn-color-preset {
+  border: 1px solid black;
+}
+
 .white-bg-button {
   background-color: #ffffff;
   color: black;
