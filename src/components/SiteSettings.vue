@@ -164,14 +164,21 @@ export default defineComponent({
           <input
             type="button"
             value="White"
-            class="white-bg-button"
+            style="background-color: #ffffff; color: black"
             @click="setBackGroundColor('#ffffff')"
           />
           <input
             type="button"
             value="Green"
-            class="green-bg-button"
+            style="background-color: #00ff00; color: black"
             @click="setBackGroundColor('#00ff00')"
+          />
+
+          <input
+            type="button"
+            value="Brown"
+            style="background-color: #552200; color: white"
+            @click="setBackGroundColor('#552200')"
           />
         </div>
       </div>
@@ -226,10 +233,10 @@ export default defineComponent({
 
       <hr />
 
-      <div v-if="selectedGamepadId === '' || selectedGamepadDevice === ''">
+      <!-- <div v-if="selectedGamepadId === '' || selectedGamepadDevice === ''">
         <p>【ゲームパッドを選択してください】</p>
-      </div>
-      <div v-else>
+      </div> -->
+      <div>
         <InputSettings
           :presetName="selectedPresetName"
           :gamepadId="selectedGamepadId"
