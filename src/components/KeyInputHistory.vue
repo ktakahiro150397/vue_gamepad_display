@@ -282,7 +282,11 @@ export default defineComponent({
       console.log(this.buttonPictSetting);
     } else if (store.state.isUseTestInputStream) {
       // テスト用のボタン設定を取得
-      this.buttonPictSetting = store.getters.getButtonPictSetting("", "");
+      this.buttonPictSetting = store.getters.getButtonPictSetting(
+        "StreamingTest",
+        "",
+        ""
+      );
     }
 
     // assets/button_promptディレクトリ内のpngファイルをインポート

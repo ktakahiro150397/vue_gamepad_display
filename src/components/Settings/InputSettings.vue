@@ -3,7 +3,6 @@ import { PropType, defineComponent } from "vue";
 import { DebugInfomation, GameLoop, GamepadKeyPressState } from "@/gameloop";
 import GamepadKeyInputInfo from "@/input-info";
 import ButtonPromptDropdown from "./ButtonPromptDropdown.vue";
-import DirectionPromptDropdown from "./DirectionPromptDropdown.vue";
 import { ButtonPictSetting } from "@/button-pict-setting";
 import store from "@/store";
 import { useToast } from "vue-toast-notification";
@@ -13,7 +12,6 @@ export default defineComponent({
   emits: ["onSaveButtonSetting", "onDeleteButtonSetting"],
   components: {
     ButtonPromptDropdown,
-    DirectionPromptDropdown,
   },
   props: {
     presetName: {
@@ -65,25 +63,12 @@ export default defineComponent({
 
       // ボタン設定
       var buttonDropdowns = this.$refs.buttonPromptDropdown as any;
-      var directionDropdowns = this.$refs.directionPromptDropdown as any;
 
       for (var i = 0; i < 16; i++) {
         // ボタン1-3の設定を取得
         for (var j = 0; j < 3; j++) {
           this.buttonPictSetting.settings[i].pictFileNames[j] =
             buttonDropdowns[i * 3 + j].selectedImageName;
-        }
-
-        // 方向キーの設定を取得
-        const directionSelectedValue = directionDropdowns[i].selectedValue;
-        console.log("directionSelectedValue=" + directionSelectedValue);
-        if (directionSelectedValue == -1) {
-          this.buttonPictSetting.settings[i].isDirectionalPad = false;
-          this.buttonPictSetting.settings[i].directionalValue = -1;
-        } else {
-          this.buttonPictSetting.settings[i].isDirectionalPad = true;
-          this.buttonPictSetting.settings[i].directionalValue =
-            directionSelectedValue;
         }
       }
 
@@ -246,7 +231,6 @@ export default defineComponent({
       <th>ボタン1</th>
       <th>ボタン2</th>
       <th>ボタン3</th>
-      <th>方向キー</th>
     </thead>
     <tbody>
       <tr v-for="index_button in 16" :key="index_button">
@@ -279,18 +263,6 @@ export default defineComponent({
               index_button_prompt - 1
             ]
           }}
-        </td>
-
-        <td>
-          <DirectionPromptDropdown
-            :buttonIndex="index_button"
-            :initialValue="
-              buttonPictSetting.settings[index_button - 1].directionalValue
-            "
-            ref="directionPromptDropdown"
-          />
-
-          {{ buttonPictSetting.settings[index_button - 1].directionalValue }}
         </td>
       </tr>
     </tbody>
