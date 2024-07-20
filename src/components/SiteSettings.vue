@@ -21,6 +21,9 @@ export default defineComponent({
       isUseTestInputStream: store.state.isUseTestInputStream,
       gamepads: [] as Gamepad[],
       devices: [] as Device[],
+      presetNames: [] as string[],
+
+      selectedPresetName: "",
       selectedGamepadId: "",
       selectedGamepadDevice: "",
     };
@@ -30,16 +33,25 @@ export default defineComponent({
       this.setBackGroundColor(this.backgroundColor);
     },
     onChangeGamepadSelection() {
-      console.log("onChangeGamepadSelection");
+      this.setPresetNameList();
     },
     onChangeDeviceSelection() {
-      console.log("onChangeDeviceSelection");
+      this.setPresetNameList();
     },
     onChangeServerUrl() {
       this.setServerUrl(this.serverUrl);
     },
     onChangeIsUseTestInputStream() {
       this.setIsUseTestInputStream(this.isUseTestInputStream);
+    },
+    onSaveButtonSetting() {
+      // ボタン設定の保存ボタン押下イベント
+      this.setPresetNameList();
+    },
+    onDeleteButtonSetting() {
+      // ボタン設定の削除ボタン押下イベント
+      this.selectedPresetName = "";
+      this.setPresetNameList();
     },
     setIsUseTestInputStream(isUseTestInputStream: boolean) {
       store.commit("setIsUseTestInputStream", isUseTestInputStream);
@@ -52,6 +64,17 @@ export default defineComponent({
       this.backgroundColor = color;
       store.commit("setBackgroundColor", color);
       this.$toast.success("背景色を変更しました。");
+    },
+    setPresetNameList() {
+      // 選択されたゲームパッドに対応するプリセット名を名称の昇順で取得
+      this.presetNames = store.state.buttonPictSettings
+        .filter(
+          (setting: any) =>
+            setting.gamepadId === this.selectedGamepadId &&
+            setting.device_id === this.selectedGamepadDevice
+        )
+        .map((setting: any) => setting.presetName)
+        .sort();
     },
     async updateGamepads() {
       try {
@@ -140,14 +163,21 @@ export default defineComponent({
           <input
             type="button"
             value="White"
-            class="white-bg-button"
+            style="background-color: #ffffff; color: black"
             @click="setBackGroundColor('#ffffff')"
           />
           <input
             type="button"
             value="Green"
-            class="green-bg-button"
+            style="background-color: #00ff00; color: black"
             @click="setBackGroundColor('#00ff00')"
+          />
+
+          <input
+            type="button"
+            value="Brown"
+            style="background-color: #552200; color: white"
+            @click="setBackGroundColor('#552200')"
           />
         </div>
       </div>
@@ -187,12 +217,32 @@ export default defineComponent({
         </select>
       </div>
 
+      <hr />
+
+      <p>
+        プリセット名を入力してください。同じプリセット名で保存した場合は上書きされます。
+      </p>
+      <label for="listPresetName">プリセット名</label>
+      <input list="presetNameDataList" v-model="selectedPresetName" />
+      <datalist id="presetNameDataList">
+        <option v-for="presetName in presetNames" :key="presetName">
+          {{ presetName }}
+        </option>
+      </datalist>
+
+      <hr />
+
+      <!-- <div v-if="selectedGamepadId === '' || selectedGamepadDevice === ''">
+        <p>【ゲームパッドを選択してください】</p>
+      </div> -->
       <div>
         <InputSettings
+          :presetName="selectedPresetName"
           :gamepadId="selectedGamepadId"
           :deviceId="selectedGamepadDevice"
+          @onSaveButtonSetting="onSaveButtonSetting"
+          @onDeleteButtonSetting="onDeleteButtonSetting"
         />
-        <!-- <KeyInputPreview :gamepadId="selectedGamepadId" /> -->
       </div>
     </fieldset>
   </div>

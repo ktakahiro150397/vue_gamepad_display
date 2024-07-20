@@ -9,15 +9,18 @@ export class DropdownImage {
 }
 
 export class ButtonPictSetting {
+    public presetName = "";
     public gamepadId = "";
     public device_id = "";
+
 
     public settings: ButtonPictSettingData[] = [];
 
     public directionalPadUpFileName = "";
     public directionalPadDownFileName = "";
 
-    constructor(gamepadId: string, device_id: string) {
+    constructor(presetName: string, gamepadId: string, device_id: string) {
+        this.presetName = presetName;
         this.gamepadId = gamepadId;
         this.device_id = device_id;
 

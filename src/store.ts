@@ -31,13 +31,23 @@ const store = createStore({
             }
         },
         setButtonPictSetting(state: any, buttonPictSetting: ButtonPictSetting) {
-            const idx = state.buttonPictSettings.findIndex((bps: ButtonPictSetting) => bps.gamepadId === buttonPictSetting.gamepadId);
+            const idx = state.buttonPictSettings.findIndex((bps: ButtonPictSetting) => bps.presetName === buttonPictSetting.presetName && bps.gamepadId === buttonPictSetting.gamepadId && bps.device_id === buttonPictSetting.device_id);
             if (idx >= 0) {
                 state.buttonPictSettings[idx] = buttonPictSetting;
                 console.log("setButtonPictSetting", buttonPictSetting.gamepadId, "Updated.");
             } else {
                 state.buttonPictSettings.push(buttonPictSetting);
                 console.log("setButtonPictSetting", buttonPictSetting.gamepadId, "Saved.");
+            }
+        },
+        deleteButtonPictSetting(state: any, payload: { presetName: string, gamepadId: string, device_id: string }) {
+            console.log("deleteButtonPictSetting", payload.presetName, payload.gamepadId, payload.device_id);
+            const idx = state.buttonPictSettings.findIndex((bps: ButtonPictSetting) => bps.presetName === payload.presetName && bps.gamepadId === payload.gamepadId && bps.device_id === payload.device_id);
+            if (idx >= 0) {
+                state.buttonPictSettings.splice(idx, 1);
+                console.log("deleteButtonPictSetting", payload.gamepadId, "Deleted.");
+            } else {
+                console.log("deleteButtonPictSetting", payload.gamepadId, "Not found.");
             }
         },
         setServerUrl(state: any, url: string) {
@@ -54,13 +64,13 @@ const store = createStore({
         }
     },
     getters: {
-        getButtonPictSetting: (state) => (gamepadId: string, device_id: string) => {
-            const idx = state.buttonPictSettings.findIndex((bps: ButtonPictSetting) => bps.gamepadId === gamepadId && bps.device_id === device_id);
+        getButtonPictSetting: (state) => (presetName: string, gamepadId: string, device_id: string) => {
+            const idx = state.buttonPictSettings.findIndex((bps: ButtonPictSetting) => bps.presetName === presetName && bps.gamepadId === gamepadId && bps.device_id === device_id);
             console.log("getButtonPictSetting", gamepadId, device_id, idx);
             if (idx >= 0) {
                 return state.buttonPictSettings[idx];
             } else {
-                return new ButtonPictSetting(gamepadId, device_id);
+                return new ButtonPictSetting(presetName, gamepadId, device_id);
             }
         }
     }
