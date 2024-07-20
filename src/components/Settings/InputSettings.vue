@@ -98,6 +98,8 @@ export default defineComponent({
           this.presetName +
           "」でボタン表示設定を保存しました。"
       );
+
+      this.$emit("onSaveButtonSetting");
     },
     onGameLoop(
       debugInfo: DebugInfomation,

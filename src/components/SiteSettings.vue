@@ -21,6 +21,8 @@ export default defineComponent({
       isUseTestInputStream: store.state.isUseTestInputStream,
       gamepads: [] as Gamepad[],
       devices: [] as Device[],
+      presetNames: [] as string[],
+
       selectedPresetName: "",
       selectedGamepadId: "",
       selectedGamepadDevice: "",
@@ -31,16 +33,20 @@ export default defineComponent({
       this.setBackGroundColor(this.backgroundColor);
     },
     onChangeGamepadSelection() {
-      console.log("onChangeGamepadSelection");
+      this.setPresetNameList();
     },
     onChangeDeviceSelection() {
-      console.log("onChangeDeviceSelection");
+      this.setPresetNameList();
     },
     onChangeServerUrl() {
       this.setServerUrl(this.serverUrl);
     },
     onChangeIsUseTestInputStream() {
       this.setIsUseTestInputStream(this.isUseTestInputStream);
+    },
+    onSaveButtonSetting() {
+      // ボタン設定の保存ボタン押下イベント
+      this.setPresetNameList();
     },
     setIsUseTestInputStream(isUseTestInputStream: boolean) {
       store.commit("setIsUseTestInputStream", isUseTestInputStream);
@@ -53,6 +59,17 @@ export default defineComponent({
       this.backgroundColor = color;
       store.commit("setBackgroundColor", color);
       this.$toast.success("背景色を変更しました。");
+    },
+    setPresetNameList() {
+      // 選択されたゲームパッドに対応するプリセット名を名称の昇順で取得
+      this.presetNames = store.state.buttonPictSettings
+        .filter(
+          (setting: any) =>
+            setting.gamepadId === this.selectedGamepadId &&
+            setting.device_id === this.selectedGamepadDevice
+        )
+        .map((setting: any) => setting.presetName)
+        .sort();
     },
     async updateGamepads() {
       try {
@@ -160,18 +177,6 @@ export default defineComponent({
       </legend>
 
       <div>
-        <p>
-          プリセット名を入力してください。同じパッドで複数のボタン表示を切り替えることができます。
-        </p>
-        <label for="listPresetName">プリセット名</label>
-        <input list="presetNameDataList" v-model="selectedPresetName" />
-        <datalist id="presetNameDataList">
-          <option value="Default"></option>
-          <option value="Custom"></option>
-        </datalist>
-
-        <hr />
-
         <p>ブラウザに接続されているゲームパッド</p>
         <select v-model="selectedGamepadId" @change="onChangeGamepadSelection">
           <option
@@ -202,11 +207,28 @@ export default defineComponent({
 
       <hr />
 
-      <div>
+      <p>
+        プリセット名を入力してください。同じプリセット名で保存した場合は上書きされます。
+      </p>
+      <label for="listPresetName">プリセット名</label>
+      <input list="presetNameDataList" v-model="selectedPresetName" />
+      <datalist id="presetNameDataList">
+        <option v-for="presetName in presetNames" :key="presetName">
+          {{ presetName }}
+        </option>
+      </datalist>
+
+      <hr />
+
+      <div v-if="selectedGamepadId === '' || selectedGamepadDevice === ''">
+        <p>【ゲームパッドを選択してください】</p>
+      </div>
+      <div v-else>
         <InputSettings
           :presetName="selectedPresetName"
           :gamepadId="selectedGamepadId"
           :deviceId="selectedGamepadDevice"
+          @onSaveButtonSetting="onSaveButtonSetting"
         />
       </div>
     </fieldset>

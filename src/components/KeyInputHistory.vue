@@ -131,8 +131,6 @@ export default defineComponent({
       this.keyInputSource.addEventListener(
         "message",
         (event: any) => {
-          console.log(event.data);
-
           // GetInputStreamResponseに変換
           const parsed = JSON.parse(event.data);
           const data = new GetInputStreamResponse(
@@ -167,7 +165,6 @@ export default defineComponent({
       // フェッチ
       this.keyInputSource = new EventSource(Url);
       this.keyInputSource.addEventListener("error", (event: any) => {
-        console.log(event);
         this.$toast.error(
           "入力情報の取得に失敗しました。サーバーが起動していること、URLが正しいことを確認してください。"
         );
@@ -175,8 +172,6 @@ export default defineComponent({
       this.keyInputSource.addEventListener(
         "message",
         (event: any) => {
-          console.log(event.data);
-
           // GetInputStreamResponseに変換
           const parsed = JSON.parse(event.data);
           const data = new GetInputStreamResponse(
@@ -192,9 +187,6 @@ export default defineComponent({
       console.log("Fetch url : " + Url);
     },
     addInputHistoryFromStream(data: GetInputStreamResponse) {
-      console.log("addInputHistoryFromStream called.");
-      console.log(data);
-
       // キー入力履歴を追加
 
       // 押下方向に応じて画像データを割り当て(テンキー方式のファイル順前提)
@@ -237,7 +229,6 @@ export default defineComponent({
         if (a.fileName > b.fileName) return 1;
         return 0;
       });
-      console.log(buttonFileDataList);
 
       const options = {
         directionFileData: directionFileData,
