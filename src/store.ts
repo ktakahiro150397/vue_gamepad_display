@@ -31,7 +31,7 @@ const store = createStore({
             }
         },
         setButtonPictSetting(state: any, buttonPictSetting: ButtonPictSetting) {
-            const idx = state.buttonPictSettings.findIndex((bps: ButtonPictSetting) => bps.gamepadId === buttonPictSetting.gamepadId);
+            const idx = state.buttonPictSettings.findIndex((bps: ButtonPictSetting) => bps.presetName === buttonPictSetting.presetName && bps.gamepadId === buttonPictSetting.gamepadId && bps.device_id === buttonPictSetting.device_id);
             if (idx >= 0) {
                 state.buttonPictSettings[idx] = buttonPictSetting;
                 console.log("setButtonPictSetting", buttonPictSetting.gamepadId, "Updated.");

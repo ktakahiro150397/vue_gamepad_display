@@ -6,6 +6,7 @@ import ButtonPromptDropdown from "./ButtonPromptDropdown.vue";
 import DirectionPromptDropdown from "./DirectionPromptDropdown.vue";
 import { ButtonPictSetting } from "@/button-pict-setting";
 import store from "@/store";
+import { useToast } from "vue-toast-notification";
 
 export default defineComponent({
   name: "InputSettings",
@@ -57,6 +58,7 @@ export default defineComponent({
     },
     getCurrentSettingData(): ButtonPictSetting {
       // 画面に入力されているボタンの設定内容を取得
+      this.buttonPictSetting.presetName = this.presetName;
       this.buttonPictSetting.gamepadId = this.gamepadId;
       this.buttonPictSetting.device_id = this.deviceId;
 
@@ -86,31 +88,16 @@ export default defineComponent({
 
       return this.buttonPictSetting;
     },
-    onChangeButtonPrompt(
-      buttonIndex: number,
-      buttonPromptIndex: number,
-      selectedImageIndex: number,
-      selectedImageName: string
-    ) {
-      console.log(
-        `onChangeButtonPrompt: buttonIndex=${buttonIndex}, buttonPromptIndex=${buttonPromptIndex}, selectedImageIndex=${selectedImageIndex}, selectedImageName=${selectedImageName}`
-      );
-
+    onClickSaveButton() {
       // ボタンの設定内容を取得し、保存する
       const currentSettingData = this.getCurrentSettingData();
       store.commit("setButtonPictSetting", currentSettingData);
-    },
-    onChangeDirectionPrompt(
-      buttonIndex: number,
-      selectedDirectionIndex: number
-    ) {
-      console.log(
-        `onChangeDirectionPrompt: buttonIndex=${buttonIndex}, selectedDirectionIndex=${selectedDirectionIndex}`
-      );
 
-      // ボタンの設定内容を取得し、保存する
-      const currentSettingData = this.getCurrentSettingData();
-      store.commit("setButtonPictSetting", currentSettingData);
+      this.$toast.success(
+        "プリセット名「" +
+          this.presetName +
+          "」でボタン表示設定を保存しました。"
+      );
     },
     onGameLoop(
       debugInfo: DebugInfomation,
@@ -144,11 +131,27 @@ export default defineComponent({
     },
   },
   watch: {
+    presetName() {
+      // プリセット名選択が変更されたときの処理
+
+      // 保存済みのボタン設定を取得
+      this.buttonPictSetting = store.getters.getButtonPictSetting(
+        this.presetName,
+        this.gamepadId,
+        this.deviceId
+      );
+      console.log(
+        "<updateGamepad> Loaded buttonPictSetting. GamepadId : " +
+          this.buttonPictSetting.gamepadId
+      );
+      console.log(this.buttonPictSetting);
+    },
     gamepadId() {
       // ゲームパッドの選択が変更されたときの処理
 
       // 保存済みのボタン設定を取得
       this.buttonPictSetting = store.getters.getButtonPictSetting(
+        this.presetName,
         this.gamepadId,
         this.deviceId
       );
@@ -163,6 +166,7 @@ export default defineComponent({
 
       // 保存済みのボタン設定を取得
       this.buttonPictSetting = store.getters.getButtonPictSetting(
+        this.presetName,
         this.gamepadId,
         this.deviceId
       );
@@ -202,6 +206,8 @@ export default defineComponent({
 <template>
   <h1>ボタン表示設定</h1>
 
+  <input type="button" value="設定を保存" @click="onClickSaveButton" />
+
   <table>
     <thead>
       <th></th>
@@ -233,7 +239,6 @@ export default defineComponent({
                 index_button_prompt - 1
               ]
             "
-            @changeDropdownImage="onChangeButtonPrompt"
             ref="buttonPromptDropdown"
           ></ButtonPromptDropdown>
 
@@ -250,7 +255,6 @@ export default defineComponent({
             :initialValue="
               buttonPictSetting.settings[index_button - 1].directionalValue
             "
-            @changeDropdownDirection="onChangeDirectionPrompt"
             ref="directionPromptDropdown"
           />
 

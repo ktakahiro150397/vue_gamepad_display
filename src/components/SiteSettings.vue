@@ -160,6 +160,18 @@ export default defineComponent({
       </legend>
 
       <div>
+        <p>
+          プリセット名を入力してください。同じパッドで複数のボタン表示を切り替えることができます。
+        </p>
+        <label for="listPresetName">プリセット名</label>
+        <input list="presetNameDataList" v-model="selectedPresetName" />
+        <datalist id="presetNameDataList">
+          <option value="Default"></option>
+          <option value="Custom"></option>
+        </datalist>
+
+        <hr />
+
         <p>ブラウザに接続されているゲームパッド</p>
         <select v-model="selectedGamepadId" @change="onChangeGamepadSelection">
           <option
@@ -188,13 +200,14 @@ export default defineComponent({
         </select>
       </div>
 
+      <hr />
+
       <div>
         <InputSettings
-          :selectedPresetName="selectedPresetName"
+          :presetName="selectedPresetName"
           :gamepadId="selectedGamepadId"
           :deviceId="selectedGamepadDevice"
         />
-        <!-- <KeyInputPreview :gamepadId="selectedGamepadId" /> -->
       </div>
     </fieldset>
   </div>
