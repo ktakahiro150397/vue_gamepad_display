@@ -211,14 +211,17 @@ export default defineComponent({
 
       <div class="card-body">
         <div class="mb-3 row">
-          <p>
-            パッド入力時に表示するボタンを設定します。<br />
-            設定するパッドを選択し、ボタンを割り当てて「保存」ボタンを押してください。<br />
-            パッドのボタンを押下すると、対象ボタン名が光ります。
-          </p>
+          <p>パッド入力時に表示するボタンを設定します。</p>
         </div>
 
-        <div class="mb-3 row">
+        <div class="row px-3">
+          <div class="alert alert-warning" role="alert">
+            <i class="bi bi-exclamation-circle-fill"></i>
+            設定するゲームパッドを選択してください。
+          </div>
+        </div>
+
+        <div class="mb-3 row px-3">
           <label class="form-label">ブラウザに接続されているゲームパッド</label>
           <select
             class="form-select"
@@ -235,7 +238,7 @@ export default defineComponent({
           </select>
         </div>
 
-        <div class="mb-3 row">
+        <div class="mb-5 row px-3">
           <label class="form-label">Windowsに接続されているゲームパッド</label>
           <select
             class="form-select"
@@ -252,43 +255,36 @@ export default defineComponent({
           </select>
         </div>
 
-        <div class="mb-3 row">
-          <label for="listPresetName" class="form-label">プリセット名</label>
-          <input
-            list="presetNameDataList"
-            class="form-select"
-            v-model="selectedPresetName"
+        <div v-if="selectedGamepadId != '' && selectedGamepadDevice != ''">
+          <hr class="mb-5" style="border-top: 5px dotted #000" />
+
+          <div class="mb-5 row px-3">
+            <label for="listPresetName" class="form-label">プリセット名</label>
+            <input
+              list="presetNameDataList"
+              class="form-select"
+              v-model="selectedPresetName"
+            />
+            <label class="form-text"
+              >プリセット名を選択または入力してください。同じプリセット名で保存した場合は上書きされます。</label
+            >
+            <datalist id="presetNameDataList">
+              <option v-for="presetName in presetNames" :key="presetName">
+                {{ presetName }}
+              </option>
+            </datalist>
+          </div>
+
+          <InputSettings
+            :presetName="selectedPresetName"
+            :gamepadId="selectedGamepadId"
+            :deviceId="selectedGamepadDevice"
+            @onSaveButtonSetting="onSaveButtonSetting"
+            @onDeleteButtonSetting="onDeleteButtonSetting"
           />
-          <label class="form-text"
-            >プリセット名を選択または入力してください。同じプリセット名で保存した場合は上書きされます。</label
-          >
-          <datalist id="presetNameDataList">
-            <option v-for="presetName in presetNames" :key="presetName">
-              {{ presetName }}
-            </option>
-          </datalist>
         </div>
       </div>
     </div>
-
-    <fieldset>
-      <legend>
-        <h2>ボタン設定</h2>
-      </legend>
-
-      <!-- <div v-if="selectedGamepadId === '' || selectedGamepadDevice === ''">
-        <p>【ゲームパッドを選択してください】</p>
-      </div> -->
-      <div>
-        <InputSettings
-          :presetName="selectedPresetName"
-          :gamepadId="selectedGamepadId"
-          :deviceId="selectedGamepadDevice"
-          @onSaveButtonSetting="onSaveButtonSetting"
-          @onDeleteButtonSetting="onDeleteButtonSetting"
-        />
-      </div>
-    </fieldset>
   </div>
 </template>
 

@@ -198,69 +198,81 @@ export default defineComponent({
 </script>
 
 <template>
-  <h1>ボタン表示設定</h1>
+  <div class="container">
+    <div class="row">
+      <div class="col">
+        <div class="alert alert-info" role="alert">
+          <i class="bi bi-info-circle-fill"></i>
+          ボタンを割り当てて「保存」ボタンを押してください。<br />
+          パッドのボタンを押すと、対象ボタン名が光ります。
+        </div>
+      </div>
 
-  <div class="container d-grid gap-2 d-md-flex justify-content-md-end">
-    <button
-      type="button"
-      value="設定を保存"
-      @click="onClickSaveButton"
-      class="btn btn-primary col-2"
-    >
-      保存
-    </button>
-    <button
-      type="button"
-      value="設定を削除"
-      @click="onClickDeleteButton"
-      class="btn btn-danger"
-    >
-      削除
-    </button>
+      <div class="col-3">
+        <div class="row justify-content-end">
+          <button
+            type="button"
+            value="設定を保存"
+            @click="onClickSaveButton"
+            class="col-8 col-sm-8 btn btn-primary me-2"
+          >
+            保存
+          </button>
+          <button
+            type="button"
+            value="設定を削除"
+            @click="onClickDeleteButton"
+            class="col-auto btn btn-danger"
+          >
+            削除
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 
-  <table>
-    <thead>
-      <th></th>
-      <th>ボタン1</th>
-      <th>ボタン2</th>
-      <th>ボタン3</th>
-    </thead>
-    <tbody>
-      <tr v-for="index_button in 16" :key="index_button">
-        <td>
-          <p
-            :style="
-              gamepadButtonLabelStyle(
-                inputInfo.buttonPressState(index_button - 1)
-              )
-            "
-          >
-            Button {{ index_button }}
-          </p>
-        </td>
+  <div class="container mt-3">
+    <div class="row text-center">
+      <div class="col-1">ボタン</div>
+      <div class="col">ボタン割当 1</div>
+      <div class="col">ボタン割当 2</div>
+      <div class="col">ボタン割当 3</div>
+    </div>
 
-        <td v-for="index_button_prompt in 3" :key="index_button_prompt">
-          <ButtonPromptDropdown
-            :buttonIndex="index_button"
-            :buttonPromptIndex="index_button_prompt"
-            :initialValue="
-              buttonPictSetting.settings[index_button - 1].pictFileNames[
-                index_button_prompt - 1
-              ]
-            "
-            ref="buttonPromptDropdown"
-          ></ButtonPromptDropdown>
+    <hr />
 
-          {{
+    <div
+      class="mb-2 row justify-content-center align-items-center"
+      v-for="index_button in 16"
+      :key="index_button"
+    >
+      <div
+        class="col-1 text-center"
+        :style="
+          gamepadButtonLabelStyle(inputInfo.buttonPressState(index_button - 1))
+        "
+      >
+        <span>Button {{ index_button }}</span>
+      </div>
+
+      <div
+        class="col"
+        v-for="index_button_prompt in 3"
+        :key="index_button_prompt"
+      >
+        <ButtonPromptDropdown
+          :buttonIndex="index_button"
+          :buttonPromptIndex="index_button_prompt"
+          :initialValue="
             buttonPictSetting.settings[index_button - 1].pictFileNames[
               index_button_prompt - 1
             ]
-          }}
-        </td>
-      </tr>
-    </tbody>
-  </table>
+          "
+          ref="buttonPromptDropdown"
+        ></ButtonPromptDropdown>
+      </div>
+    </div>
+  </div>
 </template>
 
 <style scoped>

@@ -8,6 +8,7 @@ import 'vue-toast-notification/dist/theme-bootstrap.css';
 // Import Bootstrap and BootstrapVue CSS files (order is important)
 import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
+import 'bootstrap-icons/font/bootstrap-icons.css'
 
 const app = createApp(App)
 app.use(store)
