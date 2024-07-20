@@ -112,7 +112,7 @@ export default defineComponent({
 </script>
 
 <template>
-  <div class="container mt-3">
+  <div class="container-fluid mt-3">
     <div class="card mb-4">
       <div class="card-header">サーバー設定</div>
       <div class="card-body">

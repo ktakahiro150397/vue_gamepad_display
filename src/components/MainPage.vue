@@ -17,7 +17,7 @@ export default {
 </script>
 
 <template>
-  <div class="container">
+  <div class="container-fluid">
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
       <a class="navbar-brand" @click="currentTab = 'KeyInputHistory'"
         >キー入力履歴表示サイト</a

@@ -338,7 +338,7 @@ export default defineComponent({
 </script>
 
 <template>
-  <div class="container">
+  <div class="container-fluid">
     <div class="row mt-2">
       <div class="col">
         <div>
