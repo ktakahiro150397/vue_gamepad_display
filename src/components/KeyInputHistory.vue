@@ -275,6 +275,11 @@ export default defineComponent({
       }
     },
   },
+  computed: {
+    backgroundColor() {
+      return store.state.backgroundColor;
+    },
+  },
   mounted() {
     this.updateGamepads();
     // 最初の要素を選択
@@ -392,7 +397,11 @@ export default defineComponent({
       </div>
     </div>
 
-    <div id="input-history-area">
+    <div
+      id="input-history-area"
+      class="input-history-area"
+      :style="{ backgroundColor: backgroundColor }"
+    >
       <hr class="horizontal-line" />
 
       <div
@@ -417,5 +426,10 @@ export default defineComponent({
 .horizontal-line {
   padding: 0;
   margin: 0;
+}
+
+.input-history-area {
+  height: 90vh;
+  background-color: orange;
 }
 </style>
