@@ -36,8 +36,6 @@ export default defineComponent({
   methods: {
     onChangeDropdownDirection() {
       // ドロップダウンリストの選択が変更されたときの処理
-      console.log("changeDropdownDirection");
-
       this.$emit(
         "changeDropdownDirection",
         this.buttonIndex,

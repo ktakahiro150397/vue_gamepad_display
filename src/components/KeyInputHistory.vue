@@ -1,6 +1,5 @@
 <script lang="tsx">
 import { PropType, defineComponent, createApp } from "vue";
-import { DebugInfomation, GameLoop, GamepadKeyPressState } from "@/gameloop";
 import GamepadKeyInputInfo from "@/input-info";
 import KeyInputElement from "./KeyInputElement.vue";
 import { ButtonPictSetting } from "@/button-pict-setting";
@@ -11,6 +10,9 @@ import {
   GetInputStreamResponse,
   GetServerInfo,
 } from "@/api/get-server-info";
+
+import { useToast } from "vue-toast-notification";
+import "vue-toast-notification/dist/theme-sugar.css";
 
 export default defineComponent({
   name: "KeyInputHistory",
@@ -25,10 +27,13 @@ export default defineComponent({
       devices: [] as Device[],
       selectedGamepadDevice: "",
 
+      presetNames: [] as string[],
+      selectedPresetName: "",
+
       previoutInputInfo: new GamepadKeyInputInfo(),
       inputInfo: new GamepadKeyInputInfo(),
 
-      buttonPictSetting: new ButtonPictSetting("", ""),
+      buttonPictSetting: new ButtonPictSetting("", "", ""),
       inputHistoryPropertyList: [] as any,
 
       dropdown_images: [] as DropdownImage[],
@@ -39,21 +44,43 @@ export default defineComponent({
   },
   methods: {
     async updateGamepads() {
-      var data = await GetServerInfo.getDevices();
+      if (store.state.isUseTestInputStream) {
+        this.$toast.info(
+          "テスト用のランダムな入力情報を表示しています。この設定は「表示設定」から変更できます。"
+        );
+        this.connectToGetInputStreamTest();
+      } else {
+        try {
+          var data = await GetServerInfo.getDevices();
+          this.devices = data.devices;
+        } catch (error) {
+          // デバイス一覧の取得に失敗
+          console.log(error);
 
-      this.devices = data.devices;
+          this.$toast.open({
+            message:
+              "デバイス一覧の取得に失敗しました。サーバーが起動していること、URLが正しいことを確認してください。",
+            duration: 5 * 1000,
+            type: "error",
+          });
+        }
 
-      this.gamepads = Array.from(navigator.getGamepads()).filter(
-        (gp): gp is Gamepad => gp !== null
-      );
+        this.gamepads = Array.from(navigator.getGamepads()).filter(
+          (gp): gp is Gamepad => gp !== null
+        );
 
-      if (this.gamepads.length > 0) {
-        this.selectedGamepadId = this.gamepads[0].id;
-        this.onChangeGamepadSelection();
-      }
-      if (this.devices.length > 0) {
-        this.selectedGamepadDevice = this.devices[0].device_id;
-        this.onChangeDeviceSelection();
+        if (this.gamepads.length > 0) {
+          this.selectedGamepadId = this.gamepads[0].id;
+          this.onChangeGamepadSelection();
+        }
+        if (this.devices.length > 0) {
+          this.selectedGamepadDevice = this.devices[0].device_id;
+          this.onChangeDeviceSelection();
+        }
+        if (this.presetNames.length > 0) {
+          this.selectedPresetName = this.presetNames[0];
+          this.onChangePresetSelection();
+        }
       }
     },
     generateDomId(): string {
@@ -70,29 +97,67 @@ export default defineComponent({
       return `${year}${month}${day}${hours}${minutes}${seconds}${milliseconds}`;
     },
     onChangeGamepadSelection() {
+      this.setPresetNameList();
+
       // 保存済みのボタン設定を取得
       if (
         !(this.selectedGamepadId === "" && this.selectedGamepadDevice === "")
       ) {
         this.buttonPictSetting = store.getters.getButtonPictSetting(
+          this.selectedPresetName,
           this.selectedGamepadId,
           this.selectedGamepadDevice
         );
-
-        console.log(
-          "Loaded buttonPictSetting. GamepadId : " +
-            this.buttonPictSetting.gamepadId +
-            " DeviceId : " +
-            this.buttonPictSetting.device_id
-        );
-        console.log(this.buttonPictSetting);
-
         this.connectToGetInputStream();
       }
     },
     onChangeDeviceSelection() {
       this.onChangeGamepadSelection();
-      console.log("onChangeDeviceSelection");
+    },
+    onChangePresetSelection() {
+      this.onChangeGamepadSelection();
+    },
+    setPresetNameList() {
+      // 選択されたゲームパッドに対応するプリセット名を名称の昇順で取得
+      this.presetNames = store.state.buttonPictSettings
+        .filter(
+          (setting: any) =>
+            setting.gamepadId === this.selectedGamepadId &&
+            setting.device_id === this.selectedGamepadDevice
+        )
+        .map((setting: any) => setting.presetName)
+        .sort();
+    },
+    connectToGetInputStreamTest() {
+      const Url =
+        store.state.serverUrl +
+        "/GetInputStreamTest?intervalTick=" +
+        store.state.testInputStreamFrameCount;
+
+      // フェッチ
+      this.keyInputSource = new EventSource(Url);
+      this.keyInputSource.addEventListener("error", (event: any) => {
+        console.error(event);
+        this.$toast.error(
+          "入力情報の取得に失敗しました。サーバーが起動していること、URLが正しいことを確認してください。"
+        );
+      });
+      this.keyInputSource.addEventListener(
+        "message",
+        (event: any) => {
+          // GetInputStreamResponseに変換
+          const parsed = JSON.parse(event.data);
+          const data = new GetInputStreamResponse(
+            parsed["direction_state"],
+            parsed["button_state"],
+            parsed["time_stamp"],
+            parsed["previous_push_frame"]
+          );
+          this.addInputHistoryFromStream(data);
+        },
+        false
+      );
+      console.log("Fetch url : " + Url);
     },
     connectToGetInputStream() {
       const selectedDeviceIndex = this.devices.findIndex(
@@ -113,11 +178,14 @@ export default defineComponent({
         this.devices[selectedDeviceIndex].joyId;
       // フェッチ
       this.keyInputSource = new EventSource(Url);
+      this.keyInputSource.addEventListener("error", (event: any) => {
+        this.$toast.error(
+          "入力情報の取得に失敗しました。サーバーが起動していること、URLが正しいことを確認してください。"
+        );
+      });
       this.keyInputSource.addEventListener(
         "message",
         (event: any) => {
-          console.log(event.data);
-
           // GetInputStreamResponseに変換
           const parsed = JSON.parse(event.data);
           const data = new GetInputStreamResponse(
@@ -133,9 +201,6 @@ export default defineComponent({
       console.log("Fetch url : " + Url);
     },
     addInputHistoryFromStream(data: GetInputStreamResponse) {
-      console.log("addInputHistoryFromStream called.");
-      console.log(data);
-
       // キー入力履歴を追加
 
       // 押下方向に応じて画像データを割り当て(テンキー方式のファイル順前提)
@@ -178,7 +243,6 @@ export default defineComponent({
         if (a.fileName > b.fileName) return 1;
         return 0;
       });
-      console.log(buttonFileDataList);
 
       const options = {
         directionFileData: directionFileData,
@@ -214,22 +278,27 @@ export default defineComponent({
   mounted() {
     this.updateGamepads();
     // 最初の要素を選択
-    console.log(this.gamepads);
-
     window.addEventListener("gamepadconnected", this.updateGamepads);
     window.addEventListener("gamepaddisconnected", this.updateGamepads);
 
     // 保存済みのボタン設定を取得
     if (!(this.selectedGamepadId === "")) {
       this.buttonPictSetting = store.getters.getButtonPictSetting(
-        this.gamepads[Number(this.selectedGamepadId)].id
+        this.selectedPresetName,
+        this.selectedGamepadId,
+        this.selectedGamepadDevice
       );
 
-      console.log(
-        "Loaded buttonPictSetting. GamepadId : " +
-          this.buttonPictSetting.gamepadId
+      this.setPresetNameList();
+    } else if (store.state.isUseTestInputStream) {
+      // テスト用のボタン設定を取得
+      this.buttonPictSetting = store.getters.getButtonPictSetting(
+        "StreamingTest",
+        "",
+        ""
       );
-      console.log(this.buttonPictSetting);
+
+      this.setPresetNameList();
     }
 
     // assets/button_promptディレクトリ内のpngファイルをインポート
@@ -292,6 +361,15 @@ export default defineComponent({
           :value="gamepad.device_id"
         >
           {{ gamepad.device_name }}
+        </option>
+      </select>
+    </div>
+
+    <div>
+      <p for="listPresetName">プリセット名</p>
+      <select v-model="selectedPresetName" @change="onChangePresetSelection">
+        <option v-for="presetName in presetNames" :key="presetName">
+          {{ presetName }}
         </option>
       </select>
     </div>
