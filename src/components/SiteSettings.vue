@@ -113,7 +113,7 @@ export default defineComponent({
 
 <template>
   <div class="container mt-3">
-    <div class="card mb-3">
+    <div class="card mb-4">
       <div class="card-header">サーバー設定</div>
       <div class="card-body">
         <div class="mb-3 row">
@@ -159,7 +159,7 @@ export default defineComponent({
       </div>
     </div>
 
-    <div class="card mb-3">
+    <div class="card mb-4">
       <div class="card-header">入力履歴背景色</div>
       <div class="card-body">
         <div class="mb-3 row">
