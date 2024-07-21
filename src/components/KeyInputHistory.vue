@@ -282,6 +282,13 @@ export default defineComponent({
     backgroundColor() {
       return store.state.backgroundColor;
     },
+    borderStyle() {
+      return {
+        "border-bottom": "1px solid lightgray",
+        "border-image": `linear-gradient(to right, lightgray, ${store.state.backgroundColor} 35%, ${store.state.backgroundColor} 100%)`,
+        "border-image-slice": 1,
+      };
+    },
   },
   mounted() {
     this.updateGamepads();
@@ -428,7 +435,7 @@ export default defineComponent({
       <!-- 縦並び -->
       <div v-else>
         <div
-          class="keyinput-element"
+          :style="borderStyle"
           v-for="inputHistoryProperty in inputHistoryPropertyList"
           :key="inputHistoryProperty.domId"
         >
@@ -450,12 +457,6 @@ export default defineComponent({
 .horizontal-line {
   padding: 0;
   margin: 0;
-}
-
-.keyinput-element {
-  border-bottom: 1px solid lightgray;
-  border-image: linear-gradient(to right, lightgray, white 35%, white 100%);
-  border-image-slice: 1;
 }
 
 .input-history-area {
