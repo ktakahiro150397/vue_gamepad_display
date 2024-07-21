@@ -284,7 +284,7 @@ export default defineComponent({
     },
     borderStyle() {
       return {
-        "border-bottom": "1px solid lightgray",
+        "border-top": "1px solid lightgray",
         "border-image": `linear-gradient(to right, lightgray, ${store.state.backgroundColor} 35%, ${store.state.backgroundColor} 100%)`,
         "border-image-slice": 1,
       };
@@ -433,7 +433,7 @@ export default defineComponent({
       </div>
 
       <!-- 縦並び -->
-      <div v-else>
+      <div v-else class="px-5 py-3">
         <div
           :style="borderStyle"
           v-for="inputHistoryProperty in inputHistoryPropertyList"
