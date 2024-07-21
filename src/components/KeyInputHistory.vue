@@ -477,7 +477,6 @@ export default defineComponent({
 }
 
 .input-history-area {
-  height: 90vh;
-  background-color: rgb(16, 13, 8);
+  height: 120vh;
 }
 </style>
