@@ -210,22 +210,26 @@ export default defineComponent({
 
       <div class="col-3">
         <div class="row justify-content-end">
-          <button
-            type="button"
-            value="設定を保存"
-            @click="onClickSaveButton"
-            class="col-8 col-sm-8 btn btn-primary me-2"
-          >
-            保存
-          </button>
-          <button
-            type="button"
-            value="設定を削除"
-            @click="onClickDeleteButton"
-            class="col-auto btn btn-danger"
-          >
-            削除
-          </button>
+          <div>
+            <button
+              type="button"
+              value="設定を保存"
+              @click="onClickSaveButton"
+              class="col-8 col-sm-8 btn btn-primary me-2"
+            >
+              保存
+            </button>
+          </div>
+          <div>
+            <button
+              type="button"
+              value="設定を削除"
+              @click="onClickDeleteButton"
+              class="col-auto btn btn-danger"
+            >
+              削除
+            </button>
+          </div>
         </div>
       </div>
     </div>

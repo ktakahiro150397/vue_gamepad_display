@@ -2,15 +2,17 @@ nc
 <script lang="ts">
 import SiteSettings from "./SiteSettings.vue";
 import KeyInputHistory from "./KeyInputHistory.vue";
+import PadInputDisplaySettings from "./PadInputDisplaySettings.vue";
 
 export default {
   components: {
     SiteSettings,
     KeyInputHistory,
+    PadInputDisplaySettings,
   },
   data() {
     return {
-      currentTab: "KeyInputHistory",
+      currentTab: "PadInputDisplaySettings",
     };
   },
 };
@@ -50,6 +52,16 @@ export default {
               <span :class="{ contentActive: currentTab === 'SiteSettings' }"
                 >表示設定
               </span></a
+            >
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" @click="currentTab = 'PadInputDisplaySettings'">
+              <span
+                :class="{
+                  contentActive: currentTab === 'PadInputDisplaySettings',
+                }"
+                >パッド入力表示設定</span
+              ></a
             >
           </li>
         </ul>
