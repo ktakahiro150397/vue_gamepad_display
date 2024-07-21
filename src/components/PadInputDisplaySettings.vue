@@ -1,12 +1,20 @@
 <script lang="tsx">
 import { defineComponent } from "vue";
+import PadInputDisplayKeySettings from "./Settings/PadInputDisplayKeySettings.vue";
 import store from "@/store";
 
 export default defineComponent({
   name: "PadInputDisplaySettings",
+  components: {
+    PadInputDisplayKeySettings,
+  },
   data() {
     return {
       presetNameList: [] as string[],
+      gamepads: [] as Gamepad[],
+
+      selectedPresetName: "",
+      selectedGamepadId: "",
     };
   },
   methods: {
@@ -16,9 +24,24 @@ export default defineComponent({
     onClickDeleteButton() {
       console.log("onClickDeleteButton");
     },
+    onChangeGamepadSelection() {
+      console.log("onChangeGamepadSelection");
+    },
+    async updateGamepads() {
+      this.gamepads = Array.from(navigator.getGamepads()).filter(
+        (gp): gp is Gamepad => gp !== null
+      );
+
+      if (this.gamepads.length > 0) {
+        this.selectedGamepadId = this.gamepads[0].id;
+        this.onChangeGamepadSelection();
+      }
+    },
   },
   mounted() {
     this.presetNameList = ["プリセットA", "プリセットB", "プリセットC"];
+
+    this.updateGamepads();
   },
 });
 </script>
@@ -48,43 +71,49 @@ export default defineComponent({
       <div class="card-header">入力画像表示設定</div>
       <div class="card-body">
         <div class="row mb-3">
-          <div class="col">
-            <div class="d-flex justify-content-start align-items-center gap-3">
-              <div class="alert alert-info mb-0" role="alert">
-                <i class="bi bi-info-circle-fill"></i>
-                表示するベース画像・ボタンの座標を入力して「保存」ボタンを押してください。<br />
-                パッドのボタンを押すと、対象ボタン名が光ります。
-              </div>
+          <div class="form-group">
+            <label for="inputDisplay" class="form-label">プリセット名</label>
 
-              <button
-                type="button"
-                value="設定を保存"
-                @click="onClickSaveButton"
-                class="col-2 btn btn-primary"
-              >
-                保存
-              </button>
-              <button
-                type="button"
-                value="設定を削除"
-                @click="onClickDeleteButton"
-                class="col-auto btn btn-danger"
-              >
-                削除
-              </button>
-            </div>
+            <input
+              list="presetNameDataList"
+              class="form-control"
+              v-model="selectedPresetName"
+            />
+            <datalist id="presetNameDataList">
+              <option v-for="preset in presetNameList" :key="preset">
+                {{ preset }}
+              </option>
+            </datalist>
           </div>
         </div>
 
-        <div class="form-group">
-          <label for="inputDisplay" class="form-label">プリセット名</label>
+        <div class="row mb-3">
+          <div class="col">
+            <label class="form-label"
+              >ブラウザに接続されているゲームパッド(プレビュー表示用)</label
+            >
+            <select
+              class="form-select"
+              v-model="selectedGamepadId"
+              @change="onChangeGamepadSelection"
+            >
+              <option
+                v-for="gamepad in gamepads"
+                :key="gamepad.id"
+                :value="gamepad.id"
+              >
+                {{ gamepad.id }}
+              </option>
+            </select>
+          </div>
+        </div>
 
-          <input list="presetNameDataList" class="form-control" />
-          <datalist id="presetNameDataList">
-            <option v-for="preset in presetNameList" :key="preset">
-              {{ preset }}
-            </option>
-          </datalist>
+        <div class="row mb-3">
+          <PadInputDisplayKeySettings
+            :preset-name="selectedPresetName"
+            :gamepad-id="selectedGamepadId"
+            :device-id="''"
+          />
         </div>
       </div>
     </div>
