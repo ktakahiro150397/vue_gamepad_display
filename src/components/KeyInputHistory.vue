@@ -409,7 +409,7 @@ export default defineComponent({
 
       <!-- 横並び -->
 
-      <div v-if="isDisplayHorizontal" class="d-flex align-items-end gap-3 ms-3">
+      <div v-if="isDisplayHorizontal" class="d-flex align-items-end gap-2 ms-3">
         <div
           v-for="inputHistoryProperty in inputHistoryPropertyList"
           :key="inputHistoryProperty.domId"
