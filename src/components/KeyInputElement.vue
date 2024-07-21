@@ -67,8 +67,14 @@ export default defineComponent({
     },
   },
   mounted() {
+    if (this.isFreeze || !this.isDisplayFrameCount) {
+      // フリーズ状態またはフレームカウント非表示の場合、ゲームループを実行しない
+    }
+      return;
+    } else {
     const gameLoop = GameLoop.instance;
     gameLoop.executeGameLoop(this.onGameLoop);
+    }
   },
 });
 </script>
