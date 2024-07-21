@@ -58,6 +58,7 @@ export default defineComponent({
   data() {
     return {
       currentFrameCount: this.initialFrameCount,
+      isDisplayFrameCount: store.state.isDisplayFrameCount,
     };
   },
   watch: {
@@ -74,9 +75,10 @@ export default defineComponent({
 
 <template>
   <div class="keyinput-container" :style="{ backgroundColor: backgroundColor }">
-    <div class="frame-count-container">
+    <div class="frame-count-container" v-if="isDisplayFrameCount">
       <span class="frame-count">{{ currentFrameCount }}</span>
     </div>
+    <div class="frame-count-blank-container" v-else></div>
 
     <!-- 方向キー表示 -->
     <div style="margin-right: 5px">
@@ -101,6 +103,11 @@ export default defineComponent({
   display: flex;
   align-items: center;
   margin: 0;
+}
+
+.frame-count-blank-container {
+  width: 20px;
+  height: 40px;
 }
 
 .frame-count-container {
