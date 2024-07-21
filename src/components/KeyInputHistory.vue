@@ -285,8 +285,18 @@ export default defineComponent({
     borderStyle() {
       return {
         "border-top": "1px solid lightgray",
-        "border-image": `linear-gradient(to right, lightgray, ${store.state.backgroundColor} 35%, ${store.state.backgroundColor} 100%)`,
+        "border-image": `linear-gradient(to right, lightgray, ${store.state.backgroundColor} 25rem, ${store.state.backgroundColor} 100%)`,
         "border-image-slice": 1,
+        position: "relative",
+      };
+    },
+    borderIconStyle() {
+      return {
+        position: "absolute",
+        "margin-top": "-0.6rem",
+        left: 0,
+        color: "lightgray",
+        "font-size": "0.8rem",
       };
     },
   },
@@ -439,6 +449,7 @@ export default defineComponent({
           v-for="inputHistoryProperty in inputHistoryPropertyList"
           :key="inputHistoryProperty.domId"
         >
+          <i class="bi bi-circle-fill" :style="borderIconStyle"></i>
           <KeyInputElement
             :directionFileData="inputHistoryProperty['directionFileData']"
             :buttonFileData="inputHistoryProperty['buttonFileData']"
@@ -457,6 +468,12 @@ export default defineComponent({
 .horizontal-line {
   padding: 0;
   margin: 0;
+}
+
+.key-input-border-icon {
+  position: absolute;
+  margin-top: -0.7rem;
+  left: 0;
 }
 
 .input-history-area {
