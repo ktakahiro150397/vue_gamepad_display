@@ -21,6 +21,7 @@ export default defineComponent({
       isUseTestInputStream: store.state.isUseTestInputStream,
       isDisplayFrameCount: store.state.isDisplayFrameCount,
       isDisplayHorizontal: store.state.isDisplayHorizontal,
+      displayHistoryCount: store.state.displayHistoryCount,
 
       gamepads: [] as Gamepad[],
       devices: [] as Device[],
@@ -56,6 +57,9 @@ export default defineComponent({
     onSaveButtonSetting() {
       // ボタン設定の保存ボタン押下イベント
       this.setPresetNameList();
+    },
+    onChangeDisplayHistoryCount() {
+      store.commit("setDisplayHistoryCount", this.displayHistoryCount);
     },
     onDeleteButtonSetting() {
       // ボタン設定の削除ボタン押下イベント
@@ -236,7 +240,7 @@ export default defineComponent({
           </div>
         </div>
 
-        <div class="row">
+        <div class="mb-3 row">
           <div class="col">
             <div class="form-switch">
               <input
@@ -249,6 +253,27 @@ export default defineComponent({
               <label for="chkIsDisplayHorizontal" class="form-check-label ms-2">
                 キー入力を横並びに表示する
               </label>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col">
+            <label class="form-label">表示キー履歴数</label>
+
+            <div class="row">
+              <div class="col">
+                <input
+                  type="text"
+                  class="form-control"
+                  v-model="displayHistoryCount"
+                  @change="onChangeDisplayHistoryCount"
+                  placeholder="20"
+                />
+                <span class="form-text">
+                  入力履歴を表示する最大数を入力してください。デフォルトは「20」です。
+                </span>
+              </div>
             </div>
           </div>
         </div>

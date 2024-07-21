@@ -16,6 +16,7 @@ const store = createStore({
             testInputStreamFrameCount: 10,
             isDisplayFrameCount: true,
             isDisplayHorizontal: false,
+            displayHistoryCount: 20,
         }
     },
     mutations: {
@@ -74,6 +75,12 @@ const store = createStore({
             state.isDisplayHorizontal = isDisplayHorizontal;
             if (process.env.NODE_ENV === "development") {
                 console.log("setIsDisplayHorizontal", isDisplayHorizontal);
+            }
+        },
+        setDisplayHistoryCount(state: any, displayHistoryCount: number) {
+            state.displayHistoryCount = displayHistoryCount;
+            if (process.env.NODE_ENV === "development") {
+                console.log("setDisplayHistoryCount", displayHistoryCount);
             }
         }
     },

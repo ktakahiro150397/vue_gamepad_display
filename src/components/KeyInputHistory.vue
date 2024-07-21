@@ -40,6 +40,7 @@ export default defineComponent({
       direction_image: [] as DropdownImage[],
 
       isDisplayHorizontal: store.state.isDisplayHorizontal,
+      displayHistoryCount: store.state.displayHistoryCount,
 
       keyInputSource: null as EventSource | null,
     };
@@ -272,7 +273,7 @@ export default defineComponent({
       this.inputHistoryPropertyList.unshift(options);
 
       // 制限数を超えている分を削除
-      while (this.inputHistoryPropertyList.length > 20) {
+      while (this.inputHistoryPropertyList.length > this.displayHistoryCount) {
         this.inputHistoryPropertyList.pop();
       }
     },
