@@ -428,6 +428,7 @@ export default defineComponent({
       <!-- 縦並び -->
       <div v-else>
         <div
+          class="keyinput-element"
           v-for="inputHistoryProperty in inputHistoryPropertyList"
           :key="inputHistoryProperty.domId"
         >
@@ -439,7 +440,6 @@ export default defineComponent({
             :backgroundColor="inputHistoryProperty['backgroudColor']"
             ref="keyInputElement"
           />
-          <hr class="horizontal-line" />
         </div>
       </div>
     </div>
@@ -452,8 +452,14 @@ export default defineComponent({
   margin: 0;
 }
 
+.keyinput-element {
+  border-bottom: 1px solid lightgray;
+  border-image: linear-gradient(to right, lightgray, white 35%, white 100%);
+  border-image-slice: 1;
+}
+
 .input-history-area {
   height: 90vh;
-  background-color: orange;
+  background-color: rgb(16, 13, 8);
 }
 </style>
