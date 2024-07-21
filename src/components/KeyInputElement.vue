@@ -87,29 +87,33 @@ export default defineComponent({
     </div>
     <div class="frame-count-blank-container" v-else></div> -->
 
-    <!-- ボタン表示 -->
     <div
-      v-if="buttonFileData.length"
-      class="keyinput-button-cotainer-horizontal d-flex flex-column justify-content-end align-items-center gap-1"
+      class="keyinput-container-horizontal d-flex flex-column align-items-center"
     >
-      <img
-        v-for="(fileData, index) in buttonFileData"
-        :key="index"
-        :src="fileData"
-        class="keyinput-button-img"
-      />
-    </div>
-    <div v-else class="keyinput-button-cotainer-horizontal"></div>
+      <!-- ボタン表示 -->
+      <div
+        v-if="buttonFileData.length"
+        class="keyinput-button-cotainer-horizontal d-flex flex-column justify-content-end align-items-center gap-1"
+      >
+        <img
+          v-for="(fileData, index) in buttonFileData"
+          :key="index"
+          :src="fileData"
+          class="keyinput-button-img"
+        />
+      </div>
+      <div v-else class="keyinput-button-cotainer-horizontal"></div>
 
-    <!-- 方向キー表示 -->
-    <div class="mt-1">
-      <img :src="directionFileData" class="keyinput-direction-img" />
-    </div>
+      <!-- 方向キー表示 -->
+      <div class="mt-1">
+        <img :src="directionFileData" class="keyinput-direction-img" />
+      </div>
 
-    <!-- <div class="frame-count-container" v-if="isDisplayFrameCount">
-      <span class="frame-count">{{ currentFrameCount }}</span>
+      <div v-if="isDisplayFrameCount">
+        <span class="frame-count">{{ currentFrameCount }}</span>
+      </div>
+      <div class="frame-count-blank-container" v-else></div>
     </div>
-    <div class="frame-count-blank-container" v-else></div> -->
   </div>
 
   <!-- キー入力縦表示 -->
@@ -142,8 +146,11 @@ export default defineComponent({
 </template>
 
 <style scoped>
+.keyinput-container-horizontal {
+  width: 38px;
+}
+
 .keyinput-button-cotainer-horizontal {
-  width: 32px;
   min-height: 250px;
 }
 
