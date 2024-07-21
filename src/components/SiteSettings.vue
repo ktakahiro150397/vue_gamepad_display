@@ -19,6 +19,9 @@ export default defineComponent({
       backgroundColor: store.state.backgroundColor,
       serverUrl: store.state.serverUrl,
       isUseTestInputStream: store.state.isUseTestInputStream,
+      isDisplayFrameCount: store.state.isDisplayFrameCount,
+      isDisplayHorizontal: store.state.isDisplayHorizontal,
+
       gamepads: [] as Gamepad[],
       devices: [] as Device[],
       presetNames: [] as string[],
@@ -44,6 +47,12 @@ export default defineComponent({
     onChangeIsUseTestInputStream() {
       this.setIsUseTestInputStream(this.isUseTestInputStream);
     },
+    onChangeIsDisplayFrameCount() {
+      this.setIsDisplayFrameCount(this.isDisplayFrameCount);
+    },
+    onChangeIsDisplayHorizontal() {
+      this.setIsDisplayHorizontal(this.isDisplayHorizontal);
+    },
     onSaveButtonSetting() {
       // ボタン設定の保存ボタン押下イベント
       this.setPresetNameList();
@@ -55,6 +64,12 @@ export default defineComponent({
     },
     setIsUseTestInputStream(isUseTestInputStream: boolean) {
       store.commit("setIsUseTestInputStream", isUseTestInputStream);
+    },
+    setIsDisplayFrameCount(isDisplayFrameCount: boolean) {
+      store.commit("setIsDisplayFrameCount", isDisplayFrameCount);
+    },
+    setIsDisplayHorizontal(isDisplayHorizontal: boolean) {
+      store.commit("setIsDisplayHorizontal", isDisplayHorizontal);
     },
     setServerUrl(url: string) {
       this.serverUrl = url;
@@ -160,7 +175,7 @@ export default defineComponent({
     </div>
 
     <div class="card mb-4">
-      <div class="card-header">入力履歴背景色</div>
+      <div class="card-header">表示設定</div>
       <div class="card-body">
         <div class="mb-3 row">
           <div class="col">
@@ -174,7 +189,7 @@ export default defineComponent({
           </div>
         </div>
 
-        <div class="row">
+        <div class="mb-4 row">
           <div class="col">
             <label class="form-label col-12">背景色プリセット</label>
             <button
@@ -201,6 +216,40 @@ export default defineComponent({
             >
               Brown(#552200)
             </button>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col">
+            <div class="form-switch">
+              <input
+                type="checkbox"
+                id="chkIsDisplayFrameCount"
+                class="form-check-input"
+                v-model="isDisplayFrameCount"
+                @change="onChangeIsDisplayFrameCount"
+              />
+              <label for="chkIsDisplayFrameCount" class="form-check-label ms-2">
+                入力フレーム数を表示する
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col">
+            <div class="form-switch">
+              <input
+                type="checkbox"
+                id="chkIsDisplayHorizontal"
+                class="form-check-input"
+                v-model="isDisplayHorizontal"
+                @change="onChangeIsDisplayHorizontal"
+              />
+              <label for="chkIsDisplayHorizontal" class="form-check-label ms-2">
+                キー入力を横並びに表示する
+              </label>
+            </div>
           </div>
         </div>
       </div>

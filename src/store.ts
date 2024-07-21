@@ -14,6 +14,8 @@ const store = createStore({
             serverUrl: "http://localhost:5000",
             isUseTestInputStream: false,
             testInputStreamFrameCount: 10,
+            isDisplayFrameCount: true,
+            isDisplayHorizontal: false,
         }
     },
     mutations: {
@@ -60,6 +62,18 @@ const store = createStore({
             state.isUseTestInputStream = isUseTestInputStream;
             if (process.env.NODE_ENV === "development") {
                 console.log("setIsUseTestInputStream", isUseTestInputStream);
+            }
+        },
+        setIsDisplayFrameCount(state: any, isDisplayFrameCount: boolean) {
+            state.isDisplayFrameCount = isDisplayFrameCount;
+            if (process.env.NODE_ENV === "development") {
+                console.log("setIsDisplayFrameCount", isDisplayFrameCount);
+            }
+        },
+        setIsDisplayHorizontal(state: any, isDisplayHorizontal: boolean) {
+            state.isDisplayHorizontal = isDisplayHorizontal;
+            if (process.env.NODE_ENV === "development") {
+                console.log("setIsDisplayHorizontal", isDisplayHorizontal);
             }
         }
     },
