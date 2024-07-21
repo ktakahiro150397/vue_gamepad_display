@@ -59,7 +59,26 @@ export default defineComponent({
       this.setPresetNameList();
     },
     onChangeDisplayHistoryCount() {
+      // 入力内容が数値でない場合はエラー
+      const txtField = document.getElementById("txtDisplayHistoryCount");
+
+      if (this.displayHistoryCount === "") {
+        this.$toast.error("表示キー履歴数を入力してください。");
+
+        txtField?.classList.add("is-invalid");
+        return;
+      }
+
+      if (isNaN(Number(this.displayHistoryCount))) {
+        this.$toast.error("表示キー履歴数は数値で入力してください。");
+
+        txtField?.classList.add("is-invalid");
+        return;
+      }
+
       store.commit("setDisplayHistoryCount", this.displayHistoryCount);
+      this.$toast.success("表示キー履歴数を変更しました。");
+      txtField?.classList.remove("is-invalid");
     },
     onDeleteButtonSetting() {
       // ボタン設定の削除ボタン押下イベント
@@ -146,7 +165,6 @@ export default defineComponent({
                   class="form-control"
                   v-model="serverUrl"
                   @change="onChangeServerUrl"
-                  placeholder="http://localhost:5000"
                 />
                 <span class="form-text">
                   入力取得を行うサーバーのURLを入力してください。デフォルトは「http://localhost:5000」です。
@@ -266,9 +284,9 @@ export default defineComponent({
                 <input
                   type="text"
                   class="form-control"
+                  id="txtDisplayHistoryCount"
                   v-model="displayHistoryCount"
                   @change="onChangeDisplayHistoryCount"
-                  placeholder="20"
                 />
                 <span class="form-text">
                   入力履歴を表示する最大数を入力してください。デフォルトは「20」です。
