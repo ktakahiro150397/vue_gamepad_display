@@ -285,7 +285,7 @@ export default defineComponent({
     borderStyle() {
       return {
         "border-top": "1px solid lightgray",
-        "border-image": `linear-gradient(to right, lightgray, ${store.state.backgroundColor} 25rem, ${store.state.backgroundColor} 100%)`,
+        "border-image": `linear-gradient(to right, lightgray, ${store.state.backgroundColor} 15rem, ${store.state.backgroundColor} 100%)`,
         "border-image-slice": 1,
         position: "relative",
       };
