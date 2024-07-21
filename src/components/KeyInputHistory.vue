@@ -39,6 +39,9 @@ export default defineComponent({
       dropdown_images: [] as DropdownImage[],
       direction_image: [] as DropdownImage[],
 
+      isDisplayHorizontal: store.state.isDisplayHorizontal,
+      displayHistoryCount: store.state.displayHistoryCount,
+
       keyInputSource: null as EventSource | null,
     };
   },
@@ -270,7 +273,7 @@ export default defineComponent({
       this.inputHistoryPropertyList.unshift(options);
 
       // 制限数を超えている分を削除
-      while (this.inputHistoryPropertyList.length > 20) {
+      while (this.inputHistoryPropertyList.length > this.displayHistoryCount) {
         this.inputHistoryPropertyList.pop();
       }
     },
@@ -404,19 +407,40 @@ export default defineComponent({
     >
       <hr class="horizontal-line" />
 
-      <div
-        v-for="inputHistoryProperty in inputHistoryPropertyList"
-        :key="inputHistoryProperty.domId"
-      >
-        <KeyInputElement
-          :directionFileData="inputHistoryProperty['directionFileData']"
-          :buttonFileData="inputHistoryProperty['buttonFileData']"
-          :initialFrameCount="inputHistoryProperty['initialFrameCount']"
-          :isFreeze="inputHistoryProperty['isFreeze']"
-          :backgroundColor="inputHistoryProperty['backgroudColor']"
-          ref="keyInputElement"
-        />
-        <hr class="horizontal-line" />
+      <!-- 横並び -->
+
+      <div v-if="isDisplayHorizontal" class="d-flex align-items-end gap-2 ms-3">
+        <div
+          v-for="inputHistoryProperty in inputHistoryPropertyList"
+          :key="inputHistoryProperty.domId"
+        >
+          <KeyInputElement
+            :directionFileData="inputHistoryProperty['directionFileData']"
+            :buttonFileData="inputHistoryProperty['buttonFileData']"
+            :initialFrameCount="inputHistoryProperty['initialFrameCount']"
+            :isFreeze="inputHistoryProperty['isFreeze']"
+            :backgroundColor="inputHistoryProperty['backgroudColor']"
+            ref="keyInputElement"
+          />
+        </div>
+      </div>
+
+      <!-- 縦並び -->
+      <div v-else>
+        <div
+          v-for="inputHistoryProperty in inputHistoryPropertyList"
+          :key="inputHistoryProperty.domId"
+        >
+          <KeyInputElement
+            :directionFileData="inputHistoryProperty['directionFileData']"
+            :buttonFileData="inputHistoryProperty['buttonFileData']"
+            :initialFrameCount="inputHistoryProperty['initialFrameCount']"
+            :isFreeze="inputHistoryProperty['isFreeze']"
+            :backgroundColor="inputHistoryProperty['backgroudColor']"
+            ref="keyInputElement"
+          />
+          <hr class="horizontal-line" />
+        </div>
       </div>
     </div>
   </div>

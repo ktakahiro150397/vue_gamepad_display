@@ -58,6 +58,8 @@ export default defineComponent({
   data() {
     return {
       currentFrameCount: this.initialFrameCount,
+      isDisplayFrameCount: store.state.isDisplayFrameCount,
+      isDisplayHorizontal: store.state.isDisplayHorizontal,
     };
   },
   watch: {
@@ -66,17 +68,64 @@ export default defineComponent({
     },
   },
   mounted() {
-    const gameLoop = GameLoop.instance;
-    gameLoop.executeGameLoop(this.onGameLoop);
+    if (this.isFreeze || !this.isDisplayFrameCount) {
+      // フリーズ状態またはフレームカウント非表示の場合、ゲームループを実行しない
+      return;
+    } else {
+      const gameLoop = GameLoop.instance;
+      gameLoop.executeGameLoop(this.onGameLoop);
+    }
   },
 });
 </script>
 
 <template>
-  <div class="keyinput-container" :style="{ backgroundColor: backgroundColor }">
-    <div class="frame-count-container">
+  <!-- キー入力横表示 -->
+  <div v-if="isDisplayHorizontal">
+    <!-- <div class="frame-count-container" v-if="isDisplayFrameCount">
       <span class="frame-count">{{ currentFrameCount }}</span>
     </div>
+    <div class="frame-count-blank-container" v-else></div> -->
+
+    <div
+      class="keyinput-container-horizontal d-flex flex-column align-items-center"
+    >
+      <!-- ボタン表示 -->
+      <div
+        v-if="buttonFileData.length"
+        class="keyinput-button-cotainer-horizontal d-flex flex-column justify-content-end align-items-center gap-1"
+      >
+        <img
+          v-for="(fileData, index) in buttonFileData"
+          :key="index"
+          :src="fileData"
+          class="keyinput-button-img"
+        />
+      </div>
+      <div v-else class="keyinput-button-cotainer-horizontal"></div>
+
+      <!-- 方向キー表示 -->
+      <div class="mt-1">
+        <img :src="directionFileData" class="keyinput-direction-img" />
+      </div>
+
+      <div v-if="isDisplayFrameCount">
+        <span class="frame-count">{{ currentFrameCount }}</span>
+      </div>
+      <div class="frame-count-blank-container" v-else></div>
+    </div>
+  </div>
+
+  <!-- キー入力縦表示 -->
+  <div
+    v-else
+    class="keyinput-container"
+    :style="{ backgroundColor: backgroundColor }"
+  >
+    <div class="frame-count-container" v-if="isDisplayFrameCount">
+      <span class="frame-count">{{ currentFrameCount }}</span>
+    </div>
+    <div class="frame-count-blank-container" v-else></div>
 
     <!-- 方向キー表示 -->
     <div style="margin-right: 5px">
@@ -97,10 +146,23 @@ export default defineComponent({
 </template>
 
 <style scoped>
+.keyinput-container-horizontal {
+  width: 38px;
+}
+
+.keyinput-button-cotainer-horizontal {
+  min-height: 250px;
+}
+
 .keyinput-container {
   display: flex;
   align-items: center;
   margin: 0;
+}
+
+.frame-count-blank-container {
+  width: 20px;
+  height: 40px;
 }
 
 .frame-count-container {
