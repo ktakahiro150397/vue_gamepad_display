@@ -35,6 +35,8 @@ export default defineComponent({
 
       buttonPictSetting: new ButtonPictSetting("", "", ""),
       inputHistoryPropertyList: [] as any,
+      topKeyIndexValue: ["a", "b"],
+      topKeyIndex: false,
 
       dropdown_images: [] as DropdownImage[],
       direction_image: [] as DropdownImage[],
@@ -97,21 +99,21 @@ export default defineComponent({
         }
       );
     },
-    generateDomId(): string {
-      // const date = new Date();
+    // generateDomId(): string {
+    //   // const date = new Date();
 
-      // const year = date.getFullYear();
-      // const month = String(date.getMonth() + 1).padStart(2, "0");
-      // const day = String(date.getDate()).padStart(2, "0");
-      // const hours = String(date.getHours()).padStart(2, "0");
-      // const minutes = String(date.getMinutes()).padStart(2, "0");
-      // const seconds = String(date.getSeconds()).padStart(2, "0");
-      // const milliseconds = String(date.getMilliseconds()).padStart(3, "0");
+    //   // const year = date.getFullYear();
+    //   // const month = String(date.getMonth() + 1).padStart(2, "0");
+    //   // const day = String(date.getDate()).padStart(2, "0");
+    //   // const hours = String(date.getHours()).padStart(2, "0");
+    //   // const minutes = String(date.getMinutes()).padStart(2, "0");
+    //   // const seconds = String(date.getSeconds()).padStart(2, "0");
+    //   // const milliseconds = String(date.getMilliseconds()).padStart(3, "0");
 
-      // return `${year}${month}${day}${hours}${minutes}${seconds}${milliseconds}`;
+    //   // return `${year}${month}${day}${hours}${minutes}${seconds}${milliseconds}`;
 
-      return this.generateGUID();
-    },
+    //   return this.generateGUID();
+    // },
     onChangeGamepadSelection() {
       this.setPresetNameList();
 
@@ -260,6 +262,20 @@ export default defineComponent({
         return 0;
       });
 
+      const componentElement = {
+        type: "KeyInputElement",
+        props: {
+          directionFileData: directionFileData,
+          buttonFileData: buttonFileDataList.map(
+            (element: any) => element.fileData
+          ),
+          initialFrameCount: 1,
+          isFreeze: false,
+          //domId: this.generateDomId(),
+          backgroudColor: store.state.backgroundColor,
+        },
+      };
+
       const options = {
         directionFileData: directionFileData,
         buttonFileData: buttonFileDataList.map(
@@ -267,13 +283,20 @@ export default defineComponent({
         ),
         initialFrameCount: 1,
         isFreeze: false,
-        domId: this.generateDomId(),
+        //domId: this.generateDomId(),
         backgroudColor: store.state.backgroundColor,
+        // index: this.topKeyIndex
+        //   ? this.topKeyIndexValue[0]
+        //   : this.topKeyIndexValue[1],
       };
 
+      this.topKeyIndex = !this.topKeyIndex;
+
       // 既存のインスタンスのisFreezeをtrueにする
-      this.inputHistoryPropertyList.forEach((element: any) => {
+      // インデックスを割り当てる
+      this.inputHistoryPropertyList.forEach((element: any, index: number) => {
         element.isFreeze = true;
+        element.index = index;
       });
 
       // 直前の入力情報にフレーム数を設定
@@ -442,7 +465,7 @@ export default defineComponent({
       <div v-if="isDisplayHorizontal" class="d-flex align-items-end gap-2 ms-3">
         <div
           v-for="inputHistoryProperty in inputHistoryPropertyList"
-          :key="inputHistoryProperty.domId"
+          :key="inputHistoryProperty.index"
         >
           <KeyInputElement
             :directionFileData="inputHistoryProperty['directionFileData']"
@@ -457,11 +480,8 @@ export default defineComponent({
 
       <!-- 縦並び -->
       <div v-else class="px-5 py-3">
-        <div
-          :style="borderStyle"
-          v-for="inputHistoryProperty in inputHistoryPropertyList"
-          :key="inputHistoryProperty.domId"
-        >
+        <!-- リアルタイムフレームカウントする要素 -->
+        <!-- <div :style="borderStyle">
           <i class="bi bi-circle-fill" :style="borderIconStyle"></i>
           <KeyInputElement
             :directionFileData="inputHistoryProperty['directionFileData']"
@@ -471,6 +491,30 @@ export default defineComponent({
             :backgroundColor="inputHistoryProperty['backgroudColor']"
             ref="keyInputElement"
           />
+
+          <span>{{ inputHistoryProperty.index }}</span> /
+          <span>{{ inputHistoryProperty["initialFrameCount"] }}</span> /
+          <span>{{ inputHistoryProperty["isFreeze"] }}</span>
+        </div> -->
+
+        <div
+          :style="borderStyle"
+          v-for="inputHistoryProperty in inputHistoryPropertyList"
+          :key="inputHistoryProperty.index"
+        >
+          <i class="bi bi-circle-fill" :style="borderIconStyle"></i>
+          <KeyInputElement
+            v-if="inputHistoryProperty"
+            :directionFileData="inputHistoryProperty['directionFileData']"
+            :buttonFileData="inputHistoryProperty['buttonFileData']"
+            :initialFrameCount="inputHistoryProperty['initialFrameCount']"
+            :isFreeze="inputHistoryProperty['isFreeze']"
+            :backgroundColor="inputHistoryProperty['backgroudColor']"
+          />
+
+          <span>{{ inputHistoryProperty.index }}</span> /
+          <span>{{ inputHistoryProperty["initialFrameCount"] }}</span> /
+          <span>{{ inputHistoryProperty["isFreeze"] }}</span>
         </div>
       </div>
     </div>

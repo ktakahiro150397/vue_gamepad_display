@@ -76,6 +76,9 @@ export default defineComponent({
       gameLoop.executeGameLoop(this.onGameLoop);
     }
   },
+  onBeforeUnmount() {
+    console.log("onBeforeUnmount");
+  },
 });
 </script>
 
