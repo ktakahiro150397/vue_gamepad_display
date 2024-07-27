@@ -39,11 +39,6 @@ export default defineComponent({
       required: false,
       default: 0,
     },
-    backgroundColor: {
-      type: String,
-      required: false,
-      default: "#00ff00",
-    },
     triggerFrameReset: {
       type: Boolean,
       required: false,
@@ -99,11 +94,7 @@ export default defineComponent({
 
 <template>
   <!-- ストリートファイター6風 -->
-  <div
-    v-if="historyDisplayType === 0"
-    class="keyinput-container"
-    :style="{ backgroundColor: backgroundColor }"
-  >
+  <div v-if="historyDisplayType === 0" class="keyinput-container">
     <div class="frame-count-container" v-if="isDisplayFrameCount">
       <span class="frame-count">{{ currentFrameCount }}</span>
     </div>
@@ -128,11 +119,6 @@ export default defineComponent({
 
   <!-- 鉄拳・DOA風 -->
   <div v-if="historyDisplayType === 1">
-    <!-- <div class="frame-count-container" v-if="isDisplayFrameCount">
-      <span class="frame-count">{{ currentFrameCount }}</span>
-    </div>
-    <div class="frame-count-blank-container" v-else></div> -->
-
     <div
       class="keyinput-container-horizontal d-flex flex-column align-items-center"
     >
@@ -217,6 +203,5 @@ export default defineComponent({
   display: flex;
   gap: 5px;
   align-items: center;
-  /* background-color: violet; */
 }
 </style>

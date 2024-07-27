@@ -40,7 +40,6 @@ export default defineComponent({
         buttonFileData: [],
         initialFrameCount: 1,
         isFreeze: false,
-        backgroudColor: store.state.backgroundColor,
         triggerFrameReset: false,
       },
       inputHistoryPropertyList: [] as any,
@@ -476,7 +475,6 @@ export default defineComponent({
               this.latestInputHistoryProperty['initialFrameCount']
             "
             :isFreeze="this.latestInputHistoryProperty['isFreeze']"
-            :backgroundColor="this.latestInputHistoryProperty['backgroudColor']"
             :triggerFrameReset="
               this.latestInputHistoryProperty['triggerFrameReset']
             "
@@ -496,7 +494,6 @@ export default defineComponent({
             :buttonFileData="inputHistoryProperty['buttonFileData']"
             :initialFrameCount="inputHistoryProperty['initialFrameCount']"
             :isFreeze="inputHistoryProperty['isFreeze']"
-            :backgroundColor="inputHistoryProperty['backgroudColor']"
             :historyDisplayType="inputHistoryDisplayType"
           />
         </div>
@@ -518,7 +515,6 @@ export default defineComponent({
               this.latestInputHistoryProperty['initialFrameCount']
             "
             :isFreeze="this.latestInputHistoryProperty['isFreeze']"
-            :backgroundColor="this.latestInputHistoryProperty['backgroudColor']"
             :triggerFrameReset="
               this.latestInputHistoryProperty['triggerFrameReset']
             "
@@ -536,7 +532,6 @@ export default defineComponent({
             :buttonFileData="inputHistoryProperty['buttonFileData']"
             :initialFrameCount="inputHistoryProperty['initialFrameCount']"
             :isFreeze="inputHistoryProperty['isFreeze']"
-            :backgroundColor="inputHistoryProperty['backgroudColor']"
             :historyDisplayType="inputHistoryDisplayType"
           />
         </div>
