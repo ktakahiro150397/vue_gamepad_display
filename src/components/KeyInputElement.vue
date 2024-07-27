@@ -1,5 +1,5 @@
 <script lang="tsx">
-import { PropType, defineComponent } from "vue";
+import { PropType, defineComponent, ref, defineExpose } from "vue";
 import { DebugInfomation, GameLoop, GamepadKeyPressState } from "@/gameloop";
 import GamepadKeyInputInfo from "@/input-info";
 import ButtonPromptDropdown from "./ButtonPromptDropdown.vue";
@@ -43,6 +43,11 @@ export default defineComponent({
       required: false,
       default: "#00ff00",
     },
+    triggerFrameReset: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
   },
   methods: {
     onGameLoop(
@@ -53,6 +58,9 @@ export default defineComponent({
         // 固定されていない場合、フレームカウントを更新
         this.currentFrameCount += 1;
       }
+    },
+    resetFrameCount() {
+      this.currentFrameCount = 0;
     },
   },
   data() {
@@ -66,6 +74,9 @@ export default defineComponent({
     initialFrameCount() {
       this.currentFrameCount = this.initialFrameCount;
     },
+    triggerFrameReset() {
+      this.resetFrameCount();
+    },
   },
   mounted() {
     if (this.isFreeze || !this.isDisplayFrameCount) {
@@ -75,6 +86,9 @@ export default defineComponent({
       const gameLoop = GameLoop.instance;
       gameLoop.executeGameLoop(this.onGameLoop);
     }
+  },
+  onBeforeUnmount() {
+    console.log("onBeforeUnmount");
   },
 });
 </script>
