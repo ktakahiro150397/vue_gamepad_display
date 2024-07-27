@@ -160,7 +160,7 @@ export default defineComponent({
       <!-- ボタン表示 -->
       <div
         v-else-if="buttonFileData.length"
-        class="keyinput-button-cotainer-horizontal d-flex flex-column justify-content-end align-items-center gap-1"
+        class="d-flex flex-column justify-content-end align-items-center gap-1"
       >
         <img
           v-for="(fileData, index) in buttonFileData"
@@ -169,7 +169,7 @@ export default defineComponent({
           class="keyinput-button-img"
         />
       </div>
-      <div v-else class="keyinput-button-cotainer-horizontal"></div>
+      <div v-else class=""></div>
     </div>
   </div>
 </template>
@@ -180,7 +180,7 @@ export default defineComponent({
 }
 
 .keyinput-button-cotainer-horizontal {
-  min-height: 250px;
+  height: 250px;
 }
 
 .keyinput-container {
