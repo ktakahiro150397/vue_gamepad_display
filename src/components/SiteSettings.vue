@@ -20,7 +20,6 @@ export default defineComponent({
       serverUrl: store.state.serverUrl,
       isUseTestInputStream: store.state.isUseTestInputStream,
       isDisplayFrameCount: store.state.isDisplayFrameCount,
-      isDisplayHorizontal: store.state.isDisplayHorizontal,
       displayHistoryCount: store.state.displayHistoryCount,
 
       gamepads: [] as Gamepad[],
@@ -52,9 +51,6 @@ export default defineComponent({
     },
     onChangeIsDisplayFrameCount() {
       this.setIsDisplayFrameCount(this.isDisplayFrameCount);
-    },
-    onChangeIsDisplayHorizontal() {
-      this.setIsDisplayHorizontal(this.isDisplayHorizontal);
     },
     onChangeDisplayType() {
       store.commit(
@@ -98,9 +94,6 @@ export default defineComponent({
     },
     setIsDisplayFrameCount(isDisplayFrameCount: boolean) {
       store.commit("setIsDisplayFrameCount", isDisplayFrameCount);
-    },
-    setIsDisplayHorizontal(isDisplayHorizontal: boolean) {
-      store.commit("setIsDisplayHorizontal", isDisplayHorizontal);
     },
     setServerUrl(url: string) {
       this.serverUrl = url;
@@ -287,23 +280,6 @@ export default defineComponent({
               />
               <label for="chkIsDisplayFrameCount" class="form-check-label ms-2">
                 入力フレーム数を表示する
-              </label>
-            </div>
-          </div>
-        </div>
-
-        <div class="mb-3 row">
-          <div class="col">
-            <div class="form-switch">
-              <input
-                type="checkbox"
-                id="chkIsDisplayHorizontal"
-                class="form-check-input"
-                v-model="isDisplayHorizontal"
-                @change="onChangeIsDisplayHorizontal"
-              />
-              <label for="chkIsDisplayHorizontal" class="form-check-label ms-2">
-                キー入力を横並びに表示する
               </label>
             </div>
           </div>
