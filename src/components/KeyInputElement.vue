@@ -93,8 +93,8 @@ export default defineComponent({
 </script>
 
 <template>
-  <!-- ストリートファイター6風 -->
   <div v-if="historyDisplayType === 0" class="keyinput-container">
+    <!-- ストリートファイター6風 -->
     <div class="frame-count-container" v-if="isDisplayFrameCount">
       <span class="frame-count">{{ currentFrameCount }}</span>
     </div>
@@ -117,8 +117,8 @@ export default defineComponent({
     <div v-else></div>
   </div>
 
-  <!-- 鉄拳・DOA風 -->
   <div v-if="historyDisplayType === 1">
+    <!-- 鉄拳風 -->
     <div
       class="keyinput-container-horizontal d-flex flex-column align-items-center"
     >
@@ -145,6 +145,31 @@ export default defineComponent({
         <span class="frame-count">{{ currentFrameCount }}</span>
       </div>
       <div class="frame-count-blank-container" v-else></div>
+    </div>
+  </div>
+
+  <div v-if="historyDisplayType === 2">
+    <!-- RTA風 -->
+    <div
+      class="keyinput-container-horizontal d-flex flex-column align-items-center"
+    >
+      <!-- 方向キー表示 -->
+      <div class="mt-1" v-if="directionFileData">
+        <img :src="directionFileData" class="keyinput-direction-img" />
+      </div>
+      <!-- ボタン表示 -->
+      <div
+        v-else-if="buttonFileData.length"
+        class="keyinput-button-cotainer-horizontal d-flex flex-column justify-content-end align-items-center gap-1"
+      >
+        <img
+          v-for="(fileData, index) in buttonFileData"
+          :key="index"
+          :src="fileData"
+          class="keyinput-button-img"
+        />
+      </div>
+      <div v-else class="keyinput-button-cotainer-horizontal"></div>
     </div>
   </div>
 </template>

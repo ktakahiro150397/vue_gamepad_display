@@ -95,6 +95,14 @@ export default defineComponent({
           this.selectedPresetName = this.presetNames[0];
           this.onChangePresetSelection();
         }
+
+        // キー入力ハンドラを初期化
+        this.inputStreamHandler = new DisplayButtonHandler(
+          this.inputHistoryDisplayType,
+          this.buttonPictSetting,
+          this.direction_image,
+          this.dropdown_images
+        );
       }
     },
     // GUIDを生成する関数
@@ -217,6 +225,10 @@ export default defineComponent({
 
       // 最新入力情報をハンドラ経由で取得
       const latestInput = this.inputStreamHandler.getAddProperty(data);
+      if (latestInput.length === 0) {
+        // キー入力プロパティを取得しなかった場合、なにもしない
+        return;
+      }
 
       // フレーム状態をリセットするため、プロパティを明示的に変更
       latestInput.forEach((element: any) => {
@@ -245,6 +257,11 @@ export default defineComponent({
 
       // 最新入力情報を反映
       this.latestInputHistoryProperty = latestInput[latestInput.length - 1];
+
+      // 最新入力以外をすべて履歴として追加
+      for (let i = 0; i < latestInput.length - 1; i++) {
+        this.inputHistoryPropertyList.unshift(latestInput[i]);
+      }
 
       // 制限数を超えている分の履歴データを削除
       while (
@@ -277,10 +294,10 @@ export default defineComponent({
       };
     },
   },
-  async mounted() {
+  mounted() {
     this.setPresetNameList();
 
-    await this.updateGamepads();
+    this.updateGamepads();
     // 最初の要素を選択
     window.addEventListener("gamepadconnected", this.updateGamepads);
     window.addEventListener("gamepaddisconnected", this.updateGamepads);
@@ -345,14 +362,6 @@ export default defineComponent({
           triggerFrameReset: false,
         };
       }
-    );
-
-    // キー入力ハンドラを初期化
-    this.inputStreamHandler = new DisplayButtonHandler(
-      this.inputHistoryDisplayType,
-      this.buttonPictSetting,
-      this.direction_image,
-      this.dropdown_images
     );
   },
   beforeUnmount() {
@@ -429,8 +438,8 @@ export default defineComponent({
     >
       <hr class="horizontal-line" />
 
-      <!-- ストリートファイター6風 -->
       <div v-if="inputHistoryDisplayType === 0" class="px-5 py-3">
+        <!-- ストリートファイター6風 -->
         <!-- リアルタイムフレームカウント要素 -->
         <div :style="borderStyle">
           <i class="bi bi-circle-fill" :style="borderIconStyle"></i>
@@ -467,11 +476,11 @@ export default defineComponent({
         </div>
       </div>
 
-      <!-- 鉄拳・DOA風 -->
       <div
         v-if="inputHistoryDisplayType === 1"
         class="d-flex flex-row-reverse justify-content-end align-items-end gap-2 ms-3"
       >
+        <!-- 鉄拳風 -->
         <!-- リアルタイムフレームカウント要素 -->
         <div>
           <KeyInputElement
@@ -500,6 +509,44 @@ export default defineComponent({
             :buttonFileData="inputHistoryProperty['buttonFileData']"
             :initialFrameCount="inputHistoryProperty['initialFrameCount']"
             :isFreeze="inputHistoryProperty['isFreeze']"
+            :historyDisplayType="inputHistoryDisplayType"
+          />
+        </div>
+      </div>
+
+      <div
+        v-if="inputHistoryDisplayType === 2"
+        class="d-flex flex-row-reverse justify-content-end align-items-end gap-2 ms-3"
+      >
+        <!-- RTA形式 -->
+        <!-- リアルタイムフレームカウント要素 -->
+        <div>
+          <KeyInputElement
+            :directionFileData="
+              this.latestInputHistoryProperty['directionFileData']
+            "
+            :buttonFileData="this.latestInputHistoryProperty['buttonFileData']"
+            :initialFrameCount="
+              this.latestInputHistoryProperty['initialFrameCount']
+            "
+            :isFreeze="true"
+            :triggerFrameReset="
+              this.latestInputHistoryProperty['triggerFrameReset']
+            "
+            :historyDisplayType="inputHistoryDisplayType"
+          />
+        </div>
+
+        <!-- 履歴表示 -->
+        <div
+          v-for="inputHistoryProperty in inputHistoryPropertyList"
+          :key="inputHistoryProperty.index"
+        >
+          <KeyInputElement
+            :directionFileData="inputHistoryProperty['directionFileData']"
+            :buttonFileData="inputHistoryProperty['buttonFileData']"
+            :initialFrameCount="inputHistoryProperty['initialFrameCount']"
+            :isFreeze="true"
             :historyDisplayType="inputHistoryDisplayType"
           />
         </div>
