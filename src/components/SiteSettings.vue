@@ -241,8 +241,17 @@ export default defineComponent({
           </div>
         </div>
 
-        <div class="row">
+        <div class="mb-3 row">
           <div class="col">
+            <div class="mb-1">
+              <label class="form-label">キー入力表示形式</label>
+              <select class="form-select">
+                <option value="0">ストリートファイター6風</option>
+                <option value="1">鉄拳・DOA風</option>
+                <option value="2">RTA形式表示(フレーム表示なしで固定)</option>
+              </select>
+            </div>
+
             <div class="form-switch">
               <input
                 type="checkbox"
