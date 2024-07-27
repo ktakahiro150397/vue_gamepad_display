@@ -2,12 +2,14 @@
 import SiteSettings from "./SiteSettings.vue";
 import KeyInputHistory from "./KeyInputHistory.vue";
 import About from "./About/About.vue";
+import ButtonSettings from "./Settings/ButtonSettings.vue";
 
 export default {
   components: {
     SiteSettings,
     KeyInputHistory,
     About,
+    ButtonSettings,
   },
   data() {
     return {
@@ -44,6 +46,13 @@ export default {
                 :class="{ contentActive: currentTab === 'KeyInputHistory' }"
                 >キー入力履歴表示</span
               ></a
+            >
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" @click="currentTab = 'ButtonSettings'">
+              <span :class="{ contentActive: currentTab === 'ButtonSettings' }"
+                >ボタン設定
+              </span></a
             >
           </li>
           <li class="nav-item">

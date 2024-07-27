@@ -1,46 +1,34 @@
 <script lang="tsx">
 import { defineComponent } from "vue";
 import store from "@/store";
-import InputSettings from "./Settings/InputSettings.vue";
 import {
-  Device,
-  GetDevicesResponse,
-  GetServerInfo,
-} from "@/api/get-server-info";
+  KeyHistoryDisplayType,
+  KeyInputHistoryDropdownItem,
+} from "@/display-type";
+import { Device, GetServerInfo } from "@/api/get-server-info";
 
 export default defineComponent({
   name: "SiteSettings",
-  components: {
-    InputSettings,
-    // KeyInputPreview,
-  },
+  components: {},
   data() {
     return {
       backgroundColor: store.state.backgroundColor,
       serverUrl: store.state.serverUrl,
       isUseTestInputStream: store.state.isUseTestInputStream,
       isDisplayFrameCount: store.state.isDisplayFrameCount,
-      isDisplayHorizontal: store.state.isDisplayHorizontal,
       displayHistoryCount: store.state.displayHistoryCount,
 
       gamepads: [] as Gamepad[],
       devices: [] as Device[],
       presetNames: [] as string[],
+      InputHistoryList: [] as KeyInputHistoryDropdownItem[],
 
-      selectedPresetName: "",
-      selectedGamepadId: "",
-      selectedGamepadDevice: "",
+      selectedInputHistoryDisplayType: store.state.inputHistoryDisplayType,
     };
   },
   methods: {
     onChangeBackgroundColor() {
       this.setBackGroundColor(this.backgroundColor);
-    },
-    onChangeGamepadSelection() {
-      this.setPresetNameList();
-    },
-    onChangeDeviceSelection() {
-      this.setPresetNameList();
     },
     onChangeServerUrl() {
       this.setServerUrl(this.serverUrl);
@@ -51,12 +39,11 @@ export default defineComponent({
     onChangeIsDisplayFrameCount() {
       this.setIsDisplayFrameCount(this.isDisplayFrameCount);
     },
-    onChangeIsDisplayHorizontal() {
-      this.setIsDisplayHorizontal(this.isDisplayHorizontal);
-    },
-    onSaveButtonSetting() {
-      // ボタン設定の保存ボタン押下イベント
-      this.setPresetNameList();
+    onChangeDisplayType() {
+      store.commit(
+        "setInputHistoryDisplayType",
+        this.selectedInputHistoryDisplayType
+      );
     },
     onChangeDisplayHistoryCount() {
       // 入力内容が数値でない場合はエラー
@@ -80,19 +67,11 @@ export default defineComponent({
       this.$toast.success("表示キー履歴数を変更しました。");
       txtField?.classList.remove("is-invalid");
     },
-    onDeleteButtonSetting() {
-      // ボタン設定の削除ボタン押下イベント
-      this.selectedPresetName = "";
-      this.setPresetNameList();
-    },
     setIsUseTestInputStream(isUseTestInputStream: boolean) {
       store.commit("setIsUseTestInputStream", isUseTestInputStream);
     },
     setIsDisplayFrameCount(isDisplayFrameCount: boolean) {
       store.commit("setIsDisplayFrameCount", isDisplayFrameCount);
-    },
-    setIsDisplayHorizontal(isDisplayHorizontal: boolean) {
-      store.commit("setIsDisplayHorizontal", isDisplayHorizontal);
     },
     setServerUrl(url: string) {
       this.serverUrl = url;
@@ -103,48 +82,17 @@ export default defineComponent({
       store.commit("setBackgroundColor", color);
       this.$toast.success("背景色を変更しました。");
     },
-    setPresetNameList() {
-      // 選択されたゲームパッドに対応するプリセット名を名称の昇順で取得
-      this.presetNames = store.state.buttonPictSettings
-        .filter(
-          (setting: any) =>
-            setting.gamepadId === this.selectedGamepadId &&
-            setting.device_id === this.selectedGamepadDevice
-        )
-        .map((setting: any) => setting.presetName)
-        .sort();
-    },
-    async updateGamepads() {
-      try {
-        var data = await GetServerInfo.getDevices();
-        this.devices = data.devices;
-      } catch (error) {
-        // デバイス一覧の取得に失敗
-        console.log(error);
-
-        this.$toast.open({
-          message:
-            "デバイス一覧の取得に失敗しました。サーバーが起動していること、URLが正しいことを確認してください。",
-          duration: 5 * 1000,
-          type: "error",
-        });
-      }
-
-      this.gamepads = Array.from(navigator.getGamepads()).filter(
-        (gp): gp is Gamepad => gp !== null
-      );
-      this.onChangeGamepadSelection();
-    },
   },
   computed: {},
   mounted() {
-    this.updateGamepads();
-    window.addEventListener("gamepadconnected", this.updateGamepads);
-    window.addEventListener("gamepaddisconnected", this.updateGamepads);
-  },
-  beforeUnmount() {
-    window.removeEventListener("gamepadconnected", this.updateGamepads);
-    window.removeEventListener("gamepaddisconnected", this.updateGamepads);
+    // 表示形式のドロップダウン初期化
+    Object.values(KeyHistoryDisplayType)
+      .filter((value) => typeof value === "number")
+      .forEach((value) => {
+        this.InputHistoryList.push(
+          new KeyInputHistoryDropdownItem(value as KeyHistoryDisplayType)
+        );
+      });
   },
 });
 </script>
@@ -241,8 +189,25 @@ export default defineComponent({
           </div>
         </div>
 
-        <div class="row">
+        <div class="mb-3 row">
           <div class="col">
+            <div class="mb-1">
+              <label class="form-label">キー入力表示形式</label>
+              <select
+                class="form-select"
+                v-model="selectedInputHistoryDisplayType"
+                @change="onChangeDisplayType"
+              >
+                <option
+                  v-for="item in InputHistoryList"
+                  :key="item.value"
+                  :value="item.value"
+                >
+                  {{ item.text }}
+                </option>
+              </select>
+            </div>
+
             <div class="form-switch">
               <input
                 type="checkbox"
@@ -253,23 +218,6 @@ export default defineComponent({
               />
               <label for="chkIsDisplayFrameCount" class="form-check-label ms-2">
                 入力フレーム数を表示する
-              </label>
-            </div>
-          </div>
-        </div>
-
-        <div class="mb-3 row">
-          <div class="col">
-            <div class="form-switch">
-              <input
-                type="checkbox"
-                id="chkIsDisplayHorizontal"
-                class="form-check-input"
-                v-model="isDisplayHorizontal"
-                @change="onChangeIsDisplayHorizontal"
-              />
-              <label for="chkIsDisplayHorizontal" class="form-check-label ms-2">
-                キー入力を横並びに表示する
               </label>
             </div>
           </div>
@@ -294,86 +242,6 @@ export default defineComponent({
               </div>
             </div>
           </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="card mb-3">
-      <div class="card-header">ボタン設定</div>
-
-      <div class="card-body">
-        <div class="mb-3 row">
-          <p>パッド入力時に表示するボタンを設定します。</p>
-        </div>
-
-        <div class="row px-3">
-          <div class="alert alert-warning" role="alert">
-            <i class="bi bi-exclamation-circle-fill"></i>
-            設定するゲームパッドを選択してください。
-          </div>
-        </div>
-
-        <div class="mb-3 row px-3">
-          <label class="form-label">ブラウザに接続されているゲームパッド</label>
-          <select
-            class="form-select"
-            v-model="selectedGamepadId"
-            @change="onChangeGamepadSelection"
-          >
-            <option
-              v-for="gamepad in gamepads"
-              :key="gamepad.id"
-              :value="gamepad.id.toString()"
-            >
-              {{ gamepad.id }}
-            </option>
-          </select>
-        </div>
-
-        <div class="mb-5 row px-3">
-          <label class="form-label">Windowsに接続されているゲームパッド</label>
-          <select
-            class="form-select"
-            v-model="selectedGamepadDevice"
-            @change="onChangeDeviceSelection"
-          >
-            <option
-              v-for="gamepad in devices"
-              :key="gamepad.device_id"
-              :value="gamepad.device_id"
-            >
-              {{ gamepad.device_name }}
-            </option>
-          </select>
-        </div>
-
-        <div v-if="selectedGamepadId != '' && selectedGamepadDevice != ''">
-          <hr class="mb-5" style="border-top: 5px dotted #000" />
-
-          <div class="mb-5 row px-3">
-            <label for="listPresetName" class="form-label">プリセット名</label>
-            <input
-              list="presetNameDataList"
-              class="form-select"
-              v-model="selectedPresetName"
-            />
-            <label class="form-text"
-              >プリセット名を選択または入力してください。同じプリセット名で保存した場合は上書きされます。</label
-            >
-            <datalist id="presetNameDataList">
-              <option v-for="presetName in presetNames" :key="presetName">
-                {{ presetName }}
-              </option>
-            </datalist>
-          </div>
-
-          <InputSettings
-            :presetName="selectedPresetName"
-            :gamepadId="selectedGamepadId"
-            :deviceId="selectedGamepadDevice"
-            @onSaveButtonSetting="onSaveButtonSetting"
-            @onDeleteButtonSetting="onDeleteButtonSetting"
-          />
         </div>
       </div>
     </div>
