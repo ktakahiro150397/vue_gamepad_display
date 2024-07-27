@@ -9,6 +9,8 @@ export class DisplayButtonHandler {
     public dropdown_images: DropdownImage[];
     public direction_image: DropdownImage[];
 
+    private previous_direction_state = 5;
+
     constructor(inputHistoryDisplayType: KeyHistoryDisplayType, buttonPictSetting: ButtonPictSetting, direction_image: DropdownImage[], dropdown_images: DropdownImage[]) {
         this.inputHistoryDisplayType = inputHistoryDisplayType;
         this.buttonPictSetting = buttonPictSetting;
@@ -99,6 +101,8 @@ export class DisplayButtonHandler {
      * キー入力・ボタン入力の変更が行われるたびにキー表示を個別に表示する場合のプロパティを取得
      * RTA配信で使用されるようなキー表示に対応しています。
      * 
+     * 方向キーは前回と同じ入力の場合、配列に含まれません。
+     * 
      * 以下の優先順位で配列を返却します。
      * 
      * 1. 方向キー
@@ -121,10 +125,11 @@ export class DisplayButtonHandler {
 
         const ret = [] as any;
 
-        // TODO: 現在押されているものと同じ方向キーが押されている場合は返さないようにする
         // 方向キーの割当
-        if (data.direction_state !== 5) {
-            // ニュートラル以外の場合、方向キーデータを追加
+        if (this.previous_direction_state != data.direction_state && data.direction_state !== 5) {
+            this.previous_direction_state = data.direction_state;
+
+            // 前回と入力が異なり、ニュートラル以外の場合、方向キーデータを追加
             const directionFileData =
                 this.direction_image[data.direction_state - 1].fileData;
             ret.push({
