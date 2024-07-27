@@ -1,12 +1,12 @@
 <script lang="tsx">
 import { defineComponent } from "vue";
 import store from "@/store";
-import InputSettings from "./Settings/InputSettings.vue";
 import {
-  Device,
-  GetDevicesResponse,
-  GetServerInfo,
-} from "@/api/get-server-info";
+  KeyHistoryDisplayType,
+  KeyInputHistoryDropdownItem,
+} from "@/display-type";
+import InputSettings from "./Settings/InputSettings.vue";
+import { Device, GetServerInfo } from "@/api/get-server-info";
 
 export default defineComponent({
   name: "SiteSettings",
@@ -26,10 +26,12 @@ export default defineComponent({
       gamepads: [] as Gamepad[],
       devices: [] as Device[],
       presetNames: [] as string[],
+      InputHistoryList: [] as KeyInputHistoryDropdownItem[],
 
       selectedPresetName: "",
       selectedGamepadId: "",
       selectedGamepadDevice: "",
+      selectedInputHistoryDisplayType: store.state.inputHistoryDisplayType,
     };
   },
   methods: {
@@ -53,6 +55,12 @@ export default defineComponent({
     },
     onChangeIsDisplayHorizontal() {
       this.setIsDisplayHorizontal(this.isDisplayHorizontal);
+    },
+    onChangeDisplayType() {
+      store.commit(
+        "setInputHistoryDisplayType",
+        this.selectedInputHistoryDisplayType
+      );
     },
     onSaveButtonSetting() {
       // ボタン設定の保存ボタン押下イベント
@@ -141,6 +149,15 @@ export default defineComponent({
     this.updateGamepads();
     window.addEventListener("gamepadconnected", this.updateGamepads);
     window.addEventListener("gamepaddisconnected", this.updateGamepads);
+
+    // 表示形式のドロップダウン初期化
+    Object.values(KeyHistoryDisplayType)
+      .filter((value) => typeof value === "number")
+      .forEach((value) => {
+        this.InputHistoryList.push(
+          new KeyInputHistoryDropdownItem(value as KeyHistoryDisplayType)
+        );
+      });
   },
   beforeUnmount() {
     window.removeEventListener("gamepadconnected", this.updateGamepads);
@@ -245,10 +262,18 @@ export default defineComponent({
           <div class="col">
             <div class="mb-1">
               <label class="form-label">キー入力表示形式</label>
-              <select class="form-select">
-                <option value="0">ストリートファイター6風</option>
-                <option value="1">鉄拳・DOA風</option>
-                <option value="2">RTA形式表示(フレーム表示なしで固定)</option>
+              <select
+                class="form-select"
+                v-model="selectedInputHistoryDisplayType"
+                @change="onChangeDisplayType"
+              >
+                <option
+                  v-for="item in InputHistoryList"
+                  :key="item.value"
+                  :value="item.value"
+                >
+                  {{ item.text }}
+                </option>
               </select>
             </div>
 

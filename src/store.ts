@@ -1,6 +1,7 @@
 import { createStore } from "vuex";
 import { ButtonPictSetting } from "./button-pict-setting";
 import createPersistedState from 'vuex-persistedstate'
+import { KeyHistoryDisplayType } from "./display-type";
 
 const store = createStore({
     plugins: [createPersistedState({
@@ -17,6 +18,7 @@ const store = createStore({
             isDisplayFrameCount: true,
             isDisplayHorizontal: false,
             displayHistoryCount: 20,
+            inputHistoryDisplayType: KeyHistoryDisplayType.StreetFighter,
         }
     },
     mutations: {
@@ -81,6 +83,12 @@ const store = createStore({
             state.displayHistoryCount = displayHistoryCount;
             if (process.env.NODE_ENV === "development") {
                 console.log("setDisplayHistoryCount", displayHistoryCount);
+            }
+        },
+        setInputHistoryDisplayType(state: any, displayType: KeyHistoryDisplayType) {
+            state.inputHistoryDisplayType = displayType;
+            if (process.env.NODE_ENV === "development") {
+                console.log("setInputHistoryDisplayType", displayType);
             }
         }
     },
