@@ -5,6 +5,7 @@ import KeyInputElement from "./KeyInputElement.vue";
 import { ButtonPictSetting } from "@/button-pict-setting";
 import { DropdownImage } from "@/button-pict-setting";
 import store from "@/store";
+import { KeyHistoryDisplayType } from "@/display-type";
 import {
   Device,
   GetInputStreamResponse,
@@ -47,8 +48,9 @@ export default defineComponent({
       dropdown_images: [] as DropdownImage[],
       direction_image: [] as DropdownImage[],
 
-      isDisplayHorizontal: store.state.isDisplayHorizontal,
       displayHistoryCount: store.state.displayHistoryCount,
+      inputHistoryDisplayType: store.state
+        .inputHistoryDisplayType as KeyHistoryDisplayType,
 
       keyInputSource: null as EventSource | null,
     };
@@ -460,9 +462,49 @@ export default defineComponent({
     >
       <hr class="horizontal-line" />
 
-      <!-- 横並び -->
+      <!-- ストリートファイター6風 -->
+      <div v-if="inputHistoryDisplayType === 0" class="px-5 py-3">
+        <!-- リアルタイムフレームカウント要素 -->
+        <div :style="borderStyle">
+          <i class="bi bi-circle-fill" :style="borderIconStyle"></i>
+          <KeyInputElement
+            :directionFileData="
+              this.latestInputHistoryProperty['directionFileData']
+            "
+            :buttonFileData="this.latestInputHistoryProperty['buttonFileData']"
+            :initialFrameCount="
+              this.latestInputHistoryProperty['initialFrameCount']
+            "
+            :isFreeze="this.latestInputHistoryProperty['isFreeze']"
+            :backgroundColor="this.latestInputHistoryProperty['backgroudColor']"
+            :triggerFrameReset="
+              this.latestInputHistoryProperty['triggerFrameReset']
+            "
+            :historyDisplayType="inputHistoryDisplayType"
+          />
+        </div>
+
+        <!-- 履歴表示 -->
+        <div
+          :style="borderStyle"
+          v-for="inputHistoryProperty in inputHistoryPropertyList"
+          :key="inputHistoryProperty.index"
+        >
+          <i class="bi bi-circle-fill" :style="borderIconStyle"></i>
+          <KeyInputElement
+            :directionFileData="inputHistoryProperty['directionFileData']"
+            :buttonFileData="inputHistoryProperty['buttonFileData']"
+            :initialFrameCount="inputHistoryProperty['initialFrameCount']"
+            :isFreeze="inputHistoryProperty['isFreeze']"
+            :backgroundColor="inputHistoryProperty['backgroudColor']"
+            :historyDisplayType="inputHistoryDisplayType"
+          />
+        </div>
+      </div>
+
+      <!-- 鉄拳・DOA風 -->
       <div
-        v-if="isDisplayHorizontal"
+        v-if="inputHistoryDisplayType === 1"
         class="d-flex flex-row-reverse justify-content-end align-items-end gap-2 ms-3"
       >
         <!-- リアルタイムフレームカウント要素 -->
@@ -480,6 +522,7 @@ export default defineComponent({
             :triggerFrameReset="
               this.latestInputHistoryProperty['triggerFrameReset']
             "
+            :historyDisplayType="inputHistoryDisplayType"
           />
         </div>
 
@@ -494,44 +537,7 @@ export default defineComponent({
             :initialFrameCount="inputHistoryProperty['initialFrameCount']"
             :isFreeze="inputHistoryProperty['isFreeze']"
             :backgroundColor="inputHistoryProperty['backgroudColor']"
-          />
-        </div>
-      </div>
-
-      <!-- 縦並び -->
-      <div v-else class="px-5 py-3">
-        <!-- リアルタイムフレームカウント要素 -->
-        <div :style="borderStyle">
-          <i class="bi bi-circle-fill" :style="borderIconStyle"></i>
-          <KeyInputElement
-            :directionFileData="
-              this.latestInputHistoryProperty['directionFileData']
-            "
-            :buttonFileData="this.latestInputHistoryProperty['buttonFileData']"
-            :initialFrameCount="
-              this.latestInputHistoryProperty['initialFrameCount']
-            "
-            :isFreeze="this.latestInputHistoryProperty['isFreeze']"
-            :backgroundColor="this.latestInputHistoryProperty['backgroudColor']"
-            :triggerFrameReset="
-              this.latestInputHistoryProperty['triggerFrameReset']
-            "
-          />
-        </div>
-
-        <!-- 履歴表示 -->
-        <div
-          :style="borderStyle"
-          v-for="inputHistoryProperty in inputHistoryPropertyList"
-          :key="inputHistoryProperty.index"
-        >
-          <i class="bi bi-circle-fill" :style="borderIconStyle"></i>
-          <KeyInputElement
-            :directionFileData="inputHistoryProperty['directionFileData']"
-            :buttonFileData="inputHistoryProperty['buttonFileData']"
-            :initialFrameCount="inputHistoryProperty['initialFrameCount']"
-            :isFreeze="inputHistoryProperty['isFreeze']"
-            :backgroundColor="inputHistoryProperty['backgroudColor']"
+            :historyDisplayType="inputHistoryDisplayType"
           />
         </div>
       </div>

@@ -16,7 +16,6 @@ const store = createStore({
             isUseTestInputStream: false,
             testInputStreamFrameCount: 10,
             isDisplayFrameCount: true,
-            isDisplayHorizontal: false,
             displayHistoryCount: 20,
             inputHistoryDisplayType: KeyHistoryDisplayType.StreetFighter,
         }
@@ -71,12 +70,6 @@ const store = createStore({
             state.isDisplayFrameCount = isDisplayFrameCount;
             if (process.env.NODE_ENV === "development") {
                 console.log("setIsDisplayFrameCount", isDisplayFrameCount);
-            }
-        },
-        setIsDisplayHorizontal(state: any, isDisplayHorizontal: boolean) {
-            state.isDisplayHorizontal = isDisplayHorizontal;
-            if (process.env.NODE_ENV === "development") {
-                console.log("setIsDisplayHorizontal", isDisplayHorizontal);
             }
         },
         setDisplayHistoryCount(state: any, displayHistoryCount: number) {

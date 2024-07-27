@@ -2,6 +2,7 @@
 import { PropType, defineComponent, ref, defineExpose } from "vue";
 import { DebugInfomation, GameLoop, GamepadKeyPressState } from "@/gameloop";
 import GamepadKeyInputInfo from "@/input-info";
+import { KeyHistoryDisplayType } from "@/display-type";
 import ButtonPromptDropdown from "./ButtonPromptDropdown.vue";
 import DirectionPromptDropdown from "./DirectionPromptDropdown.vue";
 import { ButtonPictSetting } from "@/button-pict-setting";
@@ -48,6 +49,10 @@ export default defineComponent({
       required: false,
       default: false,
     },
+    historyDisplayType: {
+      type: Number as PropType<KeyHistoryDisplayType>,
+      required: true,
+    },
   },
   methods: {
     onGameLoop(
@@ -67,7 +72,6 @@ export default defineComponent({
     return {
       currentFrameCount: this.initialFrameCount,
       isDisplayFrameCount: store.state.isDisplayFrameCount,
-      isDisplayHorizontal: store.state.isDisplayHorizontal,
     };
   },
   watch: {
@@ -94,8 +98,36 @@ export default defineComponent({
 </script>
 
 <template>
-  <!-- キー入力横表示 -->
-  <div v-if="isDisplayHorizontal">
+  <!-- ストリートファイター6風 -->
+  <div
+    v-if="historyDisplayType === 0"
+    class="keyinput-container"
+    :style="{ backgroundColor: backgroundColor }"
+  >
+    <div class="frame-count-container" v-if="isDisplayFrameCount">
+      <span class="frame-count">{{ currentFrameCount }}</span>
+    </div>
+    <div class="frame-count-blank-container" v-else></div>
+
+    <!-- 方向キー表示 -->
+    <div style="margin-right: 5px">
+      <img :src="directionFileData" class="keyinput-direction-img" />
+    </div>
+
+    <!-- ボタン表示 -->
+    <div v-if="buttonFileData.length" class="keyinput-button-cotainer">
+      <img
+        v-for="(fileData, index) in buttonFileData"
+        :key="index"
+        :src="fileData"
+        class="keyinput-button-img"
+      />
+    </div>
+    <div v-else></div>
+  </div>
+
+  <!-- 鉄拳・DOA風 -->
+  <div v-if="historyDisplayType === 1">
     <!-- <div class="frame-count-container" v-if="isDisplayFrameCount">
       <span class="frame-count">{{ currentFrameCount }}</span>
     </div>
@@ -128,34 +160,6 @@ export default defineComponent({
       </div>
       <div class="frame-count-blank-container" v-else></div>
     </div>
-  </div>
-
-  <!-- キー入力縦表示 -->
-  <div
-    v-else
-    class="keyinput-container"
-    :style="{ backgroundColor: backgroundColor }"
-  >
-    <div class="frame-count-container" v-if="isDisplayFrameCount">
-      <span class="frame-count">{{ currentFrameCount }}</span>
-    </div>
-    <div class="frame-count-blank-container" v-else></div>
-
-    <!-- 方向キー表示 -->
-    <div style="margin-right: 5px">
-      <img :src="directionFileData" class="keyinput-direction-img" />
-    </div>
-
-    <!-- ボタン表示 -->
-    <div v-if="buttonFileData.length" class="keyinput-button-cotainer">
-      <img
-        v-for="(fileData, index) in buttonFileData"
-        :key="index"
-        :src="fileData"
-        class="keyinput-button-img"
-      />
-    </div>
-    <div v-else></div>
   </div>
 </template>
 
