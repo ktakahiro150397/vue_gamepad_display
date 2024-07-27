@@ -25,6 +25,19 @@ export default defineComponent({
       <p>このアプリケーションの開発に寄与していただいた人たちです。</p>
     </div>
 
+    <div class="mb-3">
+      <h2>おなまえ</h2>
+      <p>なんでもいい。</p>
+      <div class="d-flex gap-1 align-items-center">
+        <i class="bi bi-twitch"></i>
+        <a :href="applicationDeveloperUrl" target="_blank">{{
+          applicationDeveloperUrl
+        }}</a>
+
+        <a>http://games.kids.yahoo.co.jp/sports/013.html</a>
+      </div>
+    </div>
+
     <div>
       <h2>ktakahiro150397</h2>
       <p>アプリケーション開発者本人 / なんでも作るので雇ってください。</p>
