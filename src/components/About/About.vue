@@ -2,12 +2,14 @@
 import { defineComponent } from "vue";
 import AboutThisApp from "./AboutThisApp.vue";
 import Contribution from "./Contribution.vue";
+import Credit from "./Credit.vue";
 
 export default defineComponent({
   name: "AboutPage",
   components: {
     AboutThisApp,
     Contribution,
+    Credit,
   },
   data() {
     return {
@@ -42,6 +44,16 @@ export default defineComponent({
               >
                 <i class="bi bi-github"></i>
                 GitHub
+              </a>
+            </li>
+            <li class="nav-item">
+              <a
+                class="nav-link active"
+                :class="{ contentActive: currentTab === 'Credit' }"
+                @click="currentTab = 'Credit'"
+              >
+                <i class="bi bi-person-heart"></i>
+                クレジット
               </a>
             </li>
           </ul>

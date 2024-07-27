@@ -1,0 +1,40 @@
+<script lang="ts">
+import { defineComponent } from "vue";
+
+export default defineComponent({
+  name: "ContributionApp",
+  computed: {
+    applicationDeveloperUrl(): string {
+      return "https://github.com/ktakahiro150397";
+    },
+  },
+});
+</script>
+
+<template>
+  <div class="row mt-4 pe-3">
+    <h1 class="border-bottom">クレジット</h1>
+
+    <div class="mb-3">
+      <p>このアプリケーションの開発に寄与していただいた人たちです。</p>
+    </div>
+
+    <div>
+      <h2>アプリケーション開発</h2>
+      <p>ktakahiro150397</p>
+      <div class="d-flex gap-2">
+        <i class="bi bi-github"></i>
+        <a :href="applicationDeveloperUrl" target="_blank">{{
+          applicationDeveloperUrl
+        }}</a>
+      </div>
+    </div>
+  </div>
+</template>
+
+<style scoped>
+h2 {
+  border-left: 0.3rem solid rgb(255, 200, 100);
+  padding-left: 0.5rem;
+}
+</style>
