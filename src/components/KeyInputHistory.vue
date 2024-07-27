@@ -69,7 +69,7 @@ export default defineComponent({
           this.devices = data.devices;
         } catch (error) {
           // デバイス一覧の取得に失敗
-          console.log(error);
+          console.error(error);
 
           this.$toast.open({
             message:

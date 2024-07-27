@@ -179,8 +179,6 @@ export class DisplayButtonHandler {
             return 0;
         });
 
-        console.log(buttonFileDataList);
-
         // ボタンごとにプロパティを追加
         for (let i = 0; i < buttonFileDataList.length; i++) {
             ret.push({
@@ -192,9 +190,6 @@ export class DisplayButtonHandler {
                 triggerFrameReset: false,
             });
         }
-
-        console.log(ret);
-
 
         return ret;
     }

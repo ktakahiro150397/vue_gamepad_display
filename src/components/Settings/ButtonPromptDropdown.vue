@@ -99,12 +99,6 @@ export default defineComponent({
       this.selectedImageIndex = this.dropdown_images.findIndex(
         (image) => image.fileName === this.initialValue
       );
-      console.log(
-        "Initial value : ",
-        this.initialValue,
-        " / selectedImageIndex : ",
-        this.selectedImageIndex
-      );
     }
   },
 });
