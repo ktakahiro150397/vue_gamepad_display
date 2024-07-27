@@ -53,7 +53,7 @@ export default defineComponent({
         .inputHistoryDisplayType as KeyHistoryDisplayType,
 
       keyInputSource: null as EventSource | null,
-      inputStreamHandler: {} as DisplayButtonHandler,
+      inputStreamHandler: null as DisplayButtonHandler | null,
     };
   },
   methods: {
@@ -128,6 +128,12 @@ export default defineComponent({
           this.selectedGamepadId,
           this.selectedGamepadDevice
         );
+        if (this.inputStreamHandler != null) {
+          console.log(this.inputStreamHandler);
+          this.inputStreamHandler.updateButtonPictSetting(
+            this.buttonPictSetting
+          );
+        }
         this.connectToGetInputStream();
       }
     },
@@ -224,7 +230,7 @@ export default defineComponent({
       // キー入力履歴を追加
 
       // 最新入力情報をハンドラ経由で取得
-      const latestInput = this.inputStreamHandler.getAddProperty(data);
+      const latestInput = this.inputStreamHandler?.getAddProperty(data);
       if (latestInput.length === 0) {
         // キー入力プロパティを取得しなかった場合、なにもしない
         return;
