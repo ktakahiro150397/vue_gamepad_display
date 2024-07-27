@@ -7,6 +7,9 @@ export default defineComponent({
     applicationDeveloperUrl(): string {
       return "https://github.com/ktakahiro150397";
     },
+    applicationDeveloperXUrl(): string {
+      return "https://x.com/ktaka0315_";
+    },
   },
 });
 </script>
@@ -21,12 +24,19 @@ export default defineComponent({
 
     <div>
       <h2>アプリケーション開発</h2>
-      <p>ktakahiro150397</p>
+      <p>開発者本人 / なんでも作るので雇ってください。</p>
       <div class="d-flex gap-2">
         <i class="bi bi-github"></i>
         <a :href="applicationDeveloperUrl" target="_blank">{{
           applicationDeveloperUrl
         }}</a>
+      </div>
+      <div class="d-flex gap-2">
+        <i class="bi bi-twitter"></i>
+        <a :href="applicationDeveloperXUrl" target="_blank">{{
+          applicationDeveloperXUrl
+        }}</a>
+        <span>(個人へご連絡の際には、フォローリクエストをお願いします)</span>
       </div>
     </div>
   </div>
