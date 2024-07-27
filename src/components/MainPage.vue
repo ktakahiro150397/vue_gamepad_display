@@ -1,12 +1,13 @@
-nc
 <script lang="ts">
 import SiteSettings from "./SiteSettings.vue";
 import KeyInputHistory from "./KeyInputHistory.vue";
+import About from "./About/About.vue";
 
 export default {
   components: {
     SiteSettings,
     KeyInputHistory,
+    About,
   },
   data() {
     return {
@@ -49,6 +50,13 @@ export default {
             <a class="nav-link" @click="currentTab = 'SiteSettings'">
               <span :class="{ contentActive: currentTab === 'SiteSettings' }"
                 >表示設定
+              </span></a
+            >
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" @click="currentTab = 'About'">
+              <span :class="{ contentActive: currentTab === 'About' }"
+                >このアプリについて
               </span></a
             >
           </li>
