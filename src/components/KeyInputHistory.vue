@@ -370,6 +370,21 @@ export default defineComponent({
     // 初期入力表示をニュートラルに設定
     this.latestInputHistoryProperty.directionFileData =
       this.direction_image[5 - 1].fileData;
+
+    // 空白をキー入力履歴数分だけ追加
+    this.inputHistoryPropertyList = Array.from(
+      { length: this.displayHistoryCount },
+      () => {
+        return {
+          directionFileData: this.direction_image[5 - 1].fileData,
+          buttonFileData: [],
+          initialFrameCount: 1,
+          isFreeze: true,
+          backgroudColor: store.state.backgroundColor,
+          triggerFrameReset: false,
+        };
+      }
+    );
   },
   beforeUnmount() {
     window.removeEventListener("gamepadconnected", this.updateGamepads);
@@ -446,7 +461,29 @@ export default defineComponent({
       <hr class="horizontal-line" />
 
       <!-- 横並び -->
-      <div v-if="isDisplayHorizontal" class="d-flex align-items-end gap-2 ms-3">
+      <div
+        v-if="isDisplayHorizontal"
+        class="d-flex flex-row-reverse justify-content-end align-items-end gap-2 ms-3"
+      >
+        <!-- リアルタイムフレームカウント要素 -->
+        <div>
+          <KeyInputElement
+            :directionFileData="
+              this.latestInputHistoryProperty['directionFileData']
+            "
+            :buttonFileData="this.latestInputHistoryProperty['buttonFileData']"
+            :initialFrameCount="
+              this.latestInputHistoryProperty['initialFrameCount']
+            "
+            :isFreeze="this.latestInputHistoryProperty['isFreeze']"
+            :backgroundColor="this.latestInputHistoryProperty['backgroudColor']"
+            :triggerFrameReset="
+              this.latestInputHistoryProperty['triggerFrameReset']
+            "
+          />
+        </div>
+
+        <!-- 履歴表示 -->
         <div
           v-for="inputHistoryProperty in inputHistoryPropertyList"
           :key="inputHistoryProperty.index"
@@ -463,7 +500,7 @@ export default defineComponent({
 
       <!-- 縦並び -->
       <div v-else class="px-5 py-3">
-        <!-- リアルタイムフレームカウントする要素 -->
+        <!-- リアルタイムフレームカウント要素 -->
         <div :style="borderStyle">
           <i class="bi bi-circle-fill" :style="borderIconStyle"></i>
           <KeyInputElement
@@ -482,6 +519,7 @@ export default defineComponent({
           />
         </div>
 
+        <!-- 履歴表示 -->
         <div
           :style="borderStyle"
           v-for="inputHistoryProperty in inputHistoryPropertyList"
