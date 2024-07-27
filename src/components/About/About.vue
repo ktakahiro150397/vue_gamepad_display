@@ -1,11 +1,13 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import AboutThisApp from "./AboutThisApp.vue";
+import Contribution from "./Contribution.vue";
 
 export default defineComponent({
   name: "AboutPage",
   components: {
     AboutThisApp,
+    Contribution,
   },
   data() {
     return {
