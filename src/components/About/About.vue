@@ -1,8 +1,12 @@
 <script lang="ts">
 import { defineComponent } from "vue";
+import AboutThisApp from "./AboutThisApp.vue";
 
 export default defineComponent({
   name: "AboutPage",
+  components: {
+    AboutThisApp,
+  },
   data() {
     return {
       currentTab: "AboutThisApp",
@@ -15,10 +19,7 @@ export default defineComponent({
   <div class="container-fluid">
     <div class="row">
       <!-- サイドメニュー -->
-      <nav
-        class="col-md-3 d-none d-md-block bg-light sidebar"
-        style="height: 100%"
-      >
+      <nav class="col-md-3 d-none d-md-block sidebar">
         <div class="sidebar-sticky">
           <ul class="nav flex-column">
             <li class="nav-item">
@@ -45,23 +46,8 @@ export default defineComponent({
         </div>
       </nav>
 
-      <div class="col-md-9" style="background-color: orange">
-        <!-- 表示コンテンツ -->
-        <p>About page</p>
-        <p>About page</p>
-        <p>About page</p>
-        <p>About page</p>
-        <p>About page</p>
-        <p>About page</p>
-        <p>About page</p>
-        <p>About page</p>
-        <p>About page</p>
-        <p>About page</p>
-        <p>About page</p>
-        <p>About page</p>
-        <p>About page</p>
-        <p>About page</p>
-        <p>About page</p>
+      <div class="col-md-9">
+        <component :is="currentTab" />
       </div>
     </div>
   </div>
