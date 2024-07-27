@@ -1,12 +1,12 @@
 <script lang="tsx">
 import { defineComponent } from "vue";
 import store from "@/store";
-import InputSettings from "./Settings/InputSettings.vue";
 import {
-  Device,
-  GetDevicesResponse,
-  GetServerInfo,
-} from "@/api/get-server-info";
+  KeyHistoryDisplayType,
+  KeyInputHistoryDropdownItem,
+} from "@/display-type";
+import InputSettings from "./Settings/InputSettings.vue";
+import { Device, GetServerInfo } from "@/api/get-server-info";
 
 export default defineComponent({
   name: "SiteSettings",
@@ -20,16 +20,17 @@ export default defineComponent({
       serverUrl: store.state.serverUrl,
       isUseTestInputStream: store.state.isUseTestInputStream,
       isDisplayFrameCount: store.state.isDisplayFrameCount,
-      isDisplayHorizontal: store.state.isDisplayHorizontal,
       displayHistoryCount: store.state.displayHistoryCount,
 
       gamepads: [] as Gamepad[],
       devices: [] as Device[],
       presetNames: [] as string[],
+      InputHistoryList: [] as KeyInputHistoryDropdownItem[],
 
       selectedPresetName: "",
       selectedGamepadId: "",
       selectedGamepadDevice: "",
+      selectedInputHistoryDisplayType: store.state.inputHistoryDisplayType,
     };
   },
   methods: {
@@ -51,8 +52,11 @@ export default defineComponent({
     onChangeIsDisplayFrameCount() {
       this.setIsDisplayFrameCount(this.isDisplayFrameCount);
     },
-    onChangeIsDisplayHorizontal() {
-      this.setIsDisplayHorizontal(this.isDisplayHorizontal);
+    onChangeDisplayType() {
+      store.commit(
+        "setInputHistoryDisplayType",
+        this.selectedInputHistoryDisplayType
+      );
     },
     onSaveButtonSetting() {
       // ボタン設定の保存ボタン押下イベント
@@ -91,9 +95,6 @@ export default defineComponent({
     setIsDisplayFrameCount(isDisplayFrameCount: boolean) {
       store.commit("setIsDisplayFrameCount", isDisplayFrameCount);
     },
-    setIsDisplayHorizontal(isDisplayHorizontal: boolean) {
-      store.commit("setIsDisplayHorizontal", isDisplayHorizontal);
-    },
     setServerUrl(url: string) {
       this.serverUrl = url;
       store.commit("setServerUrl", url);
@@ -120,7 +121,7 @@ export default defineComponent({
         this.devices = data.devices;
       } catch (error) {
         // デバイス一覧の取得に失敗
-        console.log(error);
+        console.error(error);
 
         this.$toast.open({
           message:
@@ -141,6 +142,15 @@ export default defineComponent({
     this.updateGamepads();
     window.addEventListener("gamepadconnected", this.updateGamepads);
     window.addEventListener("gamepaddisconnected", this.updateGamepads);
+
+    // 表示形式のドロップダウン初期化
+    Object.values(KeyHistoryDisplayType)
+      .filter((value) => typeof value === "number")
+      .forEach((value) => {
+        this.InputHistoryList.push(
+          new KeyInputHistoryDropdownItem(value as KeyHistoryDisplayType)
+        );
+      });
   },
   beforeUnmount() {
     window.removeEventListener("gamepadconnected", this.updateGamepads);
@@ -241,8 +251,25 @@ export default defineComponent({
           </div>
         </div>
 
-        <div class="row">
+        <div class="mb-3 row">
           <div class="col">
+            <div class="mb-1">
+              <label class="form-label">キー入力表示形式</label>
+              <select
+                class="form-select"
+                v-model="selectedInputHistoryDisplayType"
+                @change="onChangeDisplayType"
+              >
+                <option
+                  v-for="item in InputHistoryList"
+                  :key="item.value"
+                  :value="item.value"
+                >
+                  {{ item.text }}
+                </option>
+              </select>
+            </div>
+
             <div class="form-switch">
               <input
                 type="checkbox"
@@ -253,23 +280,6 @@ export default defineComponent({
               />
               <label for="chkIsDisplayFrameCount" class="form-check-label ms-2">
                 入力フレーム数を表示する
-              </label>
-            </div>
-          </div>
-        </div>
-
-        <div class="mb-3 row">
-          <div class="col">
-            <div class="form-switch">
-              <input
-                type="checkbox"
-                id="chkIsDisplayHorizontal"
-                class="form-check-input"
-                v-model="isDisplayHorizontal"
-                @change="onChangeIsDisplayHorizontal"
-              />
-              <label for="chkIsDisplayHorizontal" class="form-check-label ms-2">
-                キー入力を横並びに表示する
               </label>
             </div>
           </div>

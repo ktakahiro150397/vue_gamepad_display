@@ -5,6 +5,8 @@ import KeyInputElement from "./KeyInputElement.vue";
 import { ButtonPictSetting } from "@/button-pict-setting";
 import { DropdownImage } from "@/button-pict-setting";
 import store from "@/store";
+import { KeyHistoryDisplayType } from "@/display-type";
+import { DisplayButtonHandler } from "@/display-button-handler";
 import {
   Device,
   GetInputStreamResponse,
@@ -39,7 +41,6 @@ export default defineComponent({
         buttonFileData: [],
         initialFrameCount: 1,
         isFreeze: false,
-        backgroudColor: store.state.backgroundColor,
         triggerFrameReset: false,
       },
       inputHistoryPropertyList: [] as any,
@@ -47,10 +48,12 @@ export default defineComponent({
       dropdown_images: [] as DropdownImage[],
       direction_image: [] as DropdownImage[],
 
-      isDisplayHorizontal: store.state.isDisplayHorizontal,
       displayHistoryCount: store.state.displayHistoryCount,
+      inputHistoryDisplayType: store.state
+        .inputHistoryDisplayType as KeyHistoryDisplayType,
 
       keyInputSource: null as EventSource | null,
+      inputStreamHandler: {} as DisplayButtonHandler,
     };
   },
   methods: {
@@ -66,7 +69,7 @@ export default defineComponent({
           this.devices = data.devices;
         } catch (error) {
           // デバイス一覧の取得に失敗
-          console.log(error);
+          console.error(error);
 
           this.$toast.open({
             message:
@@ -92,6 +95,14 @@ export default defineComponent({
           this.selectedPresetName = this.presetNames[0];
           this.onChangePresetSelection();
         }
+
+        // キー入力ハンドラを初期化
+        this.inputStreamHandler = new DisplayButtonHandler(
+          this.inputHistoryDisplayType,
+          this.buttonPictSetting,
+          this.direction_image,
+          this.dropdown_images
+        );
       }
     },
     // GUIDを生成する関数
@@ -212,59 +223,20 @@ export default defineComponent({
     addInputHistoryFromStream(data: GetInputStreamResponse) {
       // キー入力履歴を追加
 
-      // 押下方向に応じて画像データを割り当て(テンキー方式のファイル順前提)
-      var directionFileData =
-        this.direction_image[data.direction_state - 1].fileData;
-
-      // 押下されているボタンの確認
-      var buttonFileDataList = [] as any;
-      for (var i = 0; i < 16; i++) {
-        if (data.button_state[i]) {
-          // 対応するボタン画像データを取得
-          for (var j = 0; j < 3; j++) {
-            if (this.buttonPictSetting.settings[i].pictFileNames[j] !== "") {
-              // ファイル名を取得
-              const fileName =
-                this.buttonPictSetting.settings[i].pictFileNames[j];
-
-              // 実ファイルデータを取得
-              const fileData = this.dropdown_images.find(
-                (image) => image.fileName === fileName
-              )?.fileData;
-
-              // 配列に追加
-              if (
-                fileData !== undefined &&
-                !buttonFileDataList.some((e: any) => e.fileName === fileName)
-              ) {
-                buttonFileDataList.push({
-                  fileName: fileName,
-                  fileData: fileData,
-                });
-              }
-            }
-          }
-        }
+      // 最新入力情報をハンドラ経由で取得
+      const latestInput = this.inputStreamHandler.getAddProperty(data);
+      if (latestInput.length === 0) {
+        // キー入力プロパティを取得しなかった場合、なにもしない
+        return;
       }
-      // ファイル名でソート
-      buttonFileDataList.sort((a: any, b: any) => {
-        if (a.fileName < b.fileName) return -1;
-        if (a.fileName > b.fileName) return 1;
-        return 0;
-      });
 
-      // 最新の入力情報
-      const latestInput = {
-        directionFileData: directionFileData,
-        buttonFileData: buttonFileDataList.map(
-          (element: any) => element.fileData
-        ),
-        initialFrameCount: 1,
-        isFreeze: false,
-        backgroudColor: store.state.backgroundColor,
-        index: -1,
-        triggerFrameReset: !this.latestInputHistoryProperty.triggerFrameReset,
-      };
+      // フレーム状態をリセットするため、プロパティを明示的に変更
+      latestInput.forEach((element: any) => {
+        element.triggerFrameReset =
+          !this.latestInputHistoryProperty.triggerFrameReset;
+        this.latestInputHistoryProperty.triggerFrameReset =
+          !this.latestInputHistoryProperty.triggerFrameReset;
+      });
 
       // 現在の最新入力情報を履歴として追加
       var addHistoryData = this.latestInputHistoryProperty;
@@ -284,7 +256,12 @@ export default defineComponent({
       }
 
       // 最新入力情報を反映
-      this.latestInputHistoryProperty = latestInput;
+      this.latestInputHistoryProperty = latestInput[latestInput.length - 1];
+
+      // 最新入力以外をすべて履歴として追加
+      for (let i = 0; i < latestInput.length - 1; i++) {
+        this.inputHistoryPropertyList.unshift(latestInput[i]);
+      }
 
       // 制限数を超えている分の履歴データを削除
       while (
@@ -318,6 +295,8 @@ export default defineComponent({
     },
   },
   mounted() {
+    this.setPresetNameList();
+
     this.updateGamepads();
     // 最初の要素を選択
     window.addEventListener("gamepadconnected", this.updateGamepads);
@@ -380,7 +359,6 @@ export default defineComponent({
           buttonFileData: [],
           initialFrameCount: 1,
           isFreeze: true,
-          backgroudColor: store.state.backgroundColor,
           triggerFrameReset: false,
         };
       }
@@ -460,46 +438,8 @@ export default defineComponent({
     >
       <hr class="horizontal-line" />
 
-      <!-- 横並び -->
-      <div
-        v-if="isDisplayHorizontal"
-        class="d-flex flex-row-reverse justify-content-end align-items-end gap-2 ms-3"
-      >
-        <!-- リアルタイムフレームカウント要素 -->
-        <div>
-          <KeyInputElement
-            :directionFileData="
-              this.latestInputHistoryProperty['directionFileData']
-            "
-            :buttonFileData="this.latestInputHistoryProperty['buttonFileData']"
-            :initialFrameCount="
-              this.latestInputHistoryProperty['initialFrameCount']
-            "
-            :isFreeze="this.latestInputHistoryProperty['isFreeze']"
-            :backgroundColor="this.latestInputHistoryProperty['backgroudColor']"
-            :triggerFrameReset="
-              this.latestInputHistoryProperty['triggerFrameReset']
-            "
-          />
-        </div>
-
-        <!-- 履歴表示 -->
-        <div
-          v-for="inputHistoryProperty in inputHistoryPropertyList"
-          :key="inputHistoryProperty.index"
-        >
-          <KeyInputElement
-            :directionFileData="inputHistoryProperty['directionFileData']"
-            :buttonFileData="inputHistoryProperty['buttonFileData']"
-            :initialFrameCount="inputHistoryProperty['initialFrameCount']"
-            :isFreeze="inputHistoryProperty['isFreeze']"
-            :backgroundColor="inputHistoryProperty['backgroudColor']"
-          />
-        </div>
-      </div>
-
-      <!-- 縦並び -->
-      <div v-else class="px-5 py-3">
+      <div v-if="inputHistoryDisplayType === 0" class="px-5 py-3">
+        <!-- ストリートファイター6風 -->
         <!-- リアルタイムフレームカウント要素 -->
         <div :style="borderStyle">
           <i class="bi bi-circle-fill" :style="borderIconStyle"></i>
@@ -512,10 +452,10 @@ export default defineComponent({
               this.latestInputHistoryProperty['initialFrameCount']
             "
             :isFreeze="this.latestInputHistoryProperty['isFreeze']"
-            :backgroundColor="this.latestInputHistoryProperty['backgroudColor']"
             :triggerFrameReset="
               this.latestInputHistoryProperty['triggerFrameReset']
             "
+            :historyDisplayType="inputHistoryDisplayType"
           />
         </div>
 
@@ -531,7 +471,83 @@ export default defineComponent({
             :buttonFileData="inputHistoryProperty['buttonFileData']"
             :initialFrameCount="inputHistoryProperty['initialFrameCount']"
             :isFreeze="inputHistoryProperty['isFreeze']"
-            :backgroundColor="inputHistoryProperty['backgroudColor']"
+            :historyDisplayType="inputHistoryDisplayType"
+          />
+        </div>
+      </div>
+
+      <div
+        v-if="inputHistoryDisplayType === 1"
+        class="d-flex flex-row-reverse justify-content-end align-items-end gap-2 ms-3"
+      >
+        <!-- 鉄拳風 -->
+        <!-- リアルタイムフレームカウント要素 -->
+        <div>
+          <KeyInputElement
+            :directionFileData="
+              this.latestInputHistoryProperty['directionFileData']
+            "
+            :buttonFileData="this.latestInputHistoryProperty['buttonFileData']"
+            :initialFrameCount="
+              this.latestInputHistoryProperty['initialFrameCount']
+            "
+            :isFreeze="this.latestInputHistoryProperty['isFreeze']"
+            :triggerFrameReset="
+              this.latestInputHistoryProperty['triggerFrameReset']
+            "
+            :historyDisplayType="inputHistoryDisplayType"
+          />
+        </div>
+
+        <!-- 履歴表示 -->
+        <div
+          v-for="inputHistoryProperty in inputHistoryPropertyList"
+          :key="inputHistoryProperty.index"
+        >
+          <KeyInputElement
+            :directionFileData="inputHistoryProperty['directionFileData']"
+            :buttonFileData="inputHistoryProperty['buttonFileData']"
+            :initialFrameCount="inputHistoryProperty['initialFrameCount']"
+            :isFreeze="inputHistoryProperty['isFreeze']"
+            :historyDisplayType="inputHistoryDisplayType"
+          />
+        </div>
+      </div>
+
+      <div
+        v-if="inputHistoryDisplayType === 2"
+        class="d-flex flex-row-reverse justify-content-end align-items-end gap-2 ms-3"
+      >
+        <!-- RTA形式 -->
+        <!-- リアルタイムフレームカウント要素 -->
+        <div>
+          <KeyInputElement
+            :directionFileData="
+              this.latestInputHistoryProperty['directionFileData']
+            "
+            :buttonFileData="this.latestInputHistoryProperty['buttonFileData']"
+            :initialFrameCount="
+              this.latestInputHistoryProperty['initialFrameCount']
+            "
+            :isFreeze="true"
+            :triggerFrameReset="
+              this.latestInputHistoryProperty['triggerFrameReset']
+            "
+            :historyDisplayType="inputHistoryDisplayType"
+          />
+        </div>
+
+        <!-- 履歴表示 -->
+        <div
+          v-for="inputHistoryProperty in inputHistoryPropertyList"
+          :key="inputHistoryProperty.index"
+        >
+          <KeyInputElement
+            :directionFileData="inputHistoryProperty['directionFileData']"
+            :buttonFileData="inputHistoryProperty['buttonFileData']"
+            :initialFrameCount="inputHistoryProperty['initialFrameCount']"
+            :isFreeze="true"
+            :historyDisplayType="inputHistoryDisplayType"
           />
         </div>
       </div>
