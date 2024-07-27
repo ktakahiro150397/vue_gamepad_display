@@ -52,7 +52,7 @@ export default defineComponent({
                 :class="{ contentActive: currentTab === 'Credit' }"
                 @click="currentTab = 'Credit'"
               >
-                <i class="bi bi-person-heart"></i>
+                <i class="bi bi-person-heart" style="color: #ff7fbf"></i>
                 クレジット
               </a>
             </li>
@@ -68,8 +68,8 @@ export default defineComponent({
 </template>
 
 <style scoped>
-.nav-item {
-  /* background-color: inherit; */
+.nav-item a {
+  border-radius: 0.5rem;
 }
 
 .nav-item a:hover {
@@ -79,5 +79,9 @@ export default defineComponent({
 
 .nav-item .contentActive {
   font-weight: bold;
+}
+
+.nav-item i {
+  color: black;
 }
 </style>

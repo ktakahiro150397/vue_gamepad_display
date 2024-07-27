@@ -16,7 +16,10 @@ export default defineComponent({
 
 <template>
   <div class="row mt-4 pe-3">
-    <h1 class="border-bottom">クレジット</h1>
+    <h1 class="border-bottom">
+      <i class="bi bi-person-heart me-2" style="color: #ff7fbf"></i>
+      <span>クレジット</span>
+    </h1>
 
     <div class="mb-3">
       <p>このアプリケーションの開発に寄与していただいた人たちです。</p>

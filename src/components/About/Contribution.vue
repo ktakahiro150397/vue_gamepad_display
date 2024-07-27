@@ -16,7 +16,10 @@ export default defineComponent({
 
 <template>
   <div class="row mt-4 pe-3">
-    <h1 class="border-bottom">コントリビューション</h1>
+    <h1 class="border-bottom">
+      <i class="bi bi-github me-1"></i>
+      <span>GitHub</span>
+    </h1>
     <p>
       サーバー・クライアントともに、このアプリのソースコードはGitHub上で公開しています。<br />
       バグ報告・機能追加のリクエストや、プルリクエストなどのあらゆるコントリビューションを歓迎しています。<br />
