@@ -19,6 +19,10 @@ export class DisplayButtonHandler {
         this.dropdown_images = dropdown_images;
     }
 
+    public updateButtonPictSetting(buttonPictSetting: ButtonPictSetting): void {
+        this.buttonPictSetting = buttonPictSetting;
+    }
+
     /**
      * 指定されたキー入力履歴の表示形式に対応する文字列を取得します。
      * @param data - キー入力ストリームから受け取ったデータ
