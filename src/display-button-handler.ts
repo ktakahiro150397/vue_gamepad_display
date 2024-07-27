@@ -43,6 +43,7 @@ export class DisplayButtonHandler {
      * キー入力・ボタン入力の変更が行われるたびにキー表示をまとめて表示する場合のプロパティを取得
      * 一般的な格闘ゲームのキー表示に対応しています。
      * @param data - キー入力ストリームから受け取ったデータ
+     * @returns キー入力履歴に表示するためのプロパティの配列
      */
     private getAddPropertyWithEveryInputChangeOnce(data: GetInputStreamResponse): any {
         // 押下方向に応じて画像データを割り当て(テンキー方式のファイル順前提)
@@ -87,7 +88,7 @@ export class DisplayButtonHandler {
         });
 
 
-        return {
+        return [{
             directionFileData: directionFileData,
             buttonFileData: buttonFileDataList.map(
                 (element: any) => element.fileData
@@ -95,15 +96,22 @@ export class DisplayButtonHandler {
             initialFrameCount: 1,
             isFreeze: false,
             index: -1,
-        };
+        }];
     }
 
     /**
      * キー入力・ボタン入力の変更が行われるたびにキー表示を個別に表示する場合のプロパティを取得
      * RTA配信で使用されるようなキー表示に対応しています。
      * @param data - キー入力ストリームから受け取ったデータ
+     * @returns キー入力履歴に表示するためのプロパティの配列
      */
     private getAddPropertyWithInputChangeSeparately(data: GetInputStreamResponse): any {
-        return {};
+        return [{
+            directionFileData: "",
+            buttonFileData: [],
+            initialFrameCount: 1,
+            isFreeze: false,
+            index: -1,
+        }];
     }
 }

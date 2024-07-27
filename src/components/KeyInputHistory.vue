@@ -215,12 +215,16 @@ export default defineComponent({
     addInputHistoryFromStream(data: GetInputStreamResponse) {
       // キー入力履歴を追加
 
-      // 最新入力情報を取得
+      // 最新入力情報をハンドラ経由で取得
       const latestInput = this.inputStreamHandler.getAddProperty(data);
 
       // フレーム状態をリセットするため、プロパティを明示的に変更
-      latestInput.triggerFrameReset =
-        !this.latestInputHistoryProperty.triggerFrameReset;
+      latestInput.forEach((element: any) => {
+        element.triggerFrameReset =
+          !this.latestInputHistoryProperty.triggerFrameReset;
+        this.latestInputHistoryProperty.triggerFrameReset =
+          !this.latestInputHistoryProperty.triggerFrameReset;
+      });
 
       // 現在の最新入力情報を履歴として追加
       var addHistoryData = this.latestInputHistoryProperty;
@@ -240,7 +244,7 @@ export default defineComponent({
       }
 
       // 最新入力情報を反映
-      this.latestInputHistoryProperty = latestInput;
+      this.latestInputHistoryProperty = latestInput[latestInput.length - 1];
 
       // 制限数を超えている分の履歴データを削除
       while (
