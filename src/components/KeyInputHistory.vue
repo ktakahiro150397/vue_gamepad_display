@@ -6,6 +6,7 @@ import { ButtonPictSetting } from "@/button-pict-setting";
 import { DropdownImage } from "@/button-pict-setting";
 import store from "@/store";
 import { KeyHistoryDisplayType } from "@/display-type";
+import { DisplayButtonHandler } from "@/display-button-handler";
 import {
   Device,
   GetInputStreamResponse,
@@ -52,6 +53,7 @@ export default defineComponent({
         .inputHistoryDisplayType as KeyHistoryDisplayType,
 
       keyInputSource: null as EventSource | null,
+      inputStreamHandler: {} as DisplayButtonHandler,
     };
   },
   methods: {
@@ -213,59 +215,12 @@ export default defineComponent({
     addInputHistoryFromStream(data: GetInputStreamResponse) {
       // キー入力履歴を追加
 
-      // 押下方向に応じて画像データを割り当て(テンキー方式のファイル順前提)
-      var directionFileData =
-        this.direction_image[data.direction_state - 1].fileData;
+      // 最新入力情報を取得
+      const latestInput = this.inputStreamHandler.getAddProperty(data);
 
-      // 押下されているボタンの確認
-      var buttonFileDataList = [] as any;
-      for (var i = 0; i < 16; i++) {
-        if (data.button_state[i]) {
-          // 対応するボタン画像データを取得
-          for (var j = 0; j < 3; j++) {
-            if (this.buttonPictSetting.settings[i].pictFileNames[j] !== "") {
-              // ファイル名を取得
-              const fileName =
-                this.buttonPictSetting.settings[i].pictFileNames[j];
-
-              // 実ファイルデータを取得
-              const fileData = this.dropdown_images.find(
-                (image) => image.fileName === fileName
-              )?.fileData;
-
-              // 配列に追加
-              if (
-                fileData !== undefined &&
-                !buttonFileDataList.some((e: any) => e.fileName === fileName)
-              ) {
-                buttonFileDataList.push({
-                  fileName: fileName,
-                  fileData: fileData,
-                });
-              }
-            }
-          }
-        }
-      }
-      // ファイル名でソート
-      buttonFileDataList.sort((a: any, b: any) => {
-        if (a.fileName < b.fileName) return -1;
-        if (a.fileName > b.fileName) return 1;
-        return 0;
-      });
-
-      // 最新の入力情報
-      const latestInput = {
-        directionFileData: directionFileData,
-        buttonFileData: buttonFileDataList.map(
-          (element: any) => element.fileData
-        ),
-        initialFrameCount: 1,
-        isFreeze: false,
-        backgroudColor: store.state.backgroundColor,
-        index: -1,
-        triggerFrameReset: !this.latestInputHistoryProperty.triggerFrameReset,
-      };
+      // フレーム状態をリセットするため、プロパティを明示的に変更
+      latestInput.triggerFrameReset =
+        !this.latestInputHistoryProperty.triggerFrameReset;
 
       // 現在の最新入力情報を履歴として追加
       var addHistoryData = this.latestInputHistoryProperty;
@@ -318,8 +273,10 @@ export default defineComponent({
       };
     },
   },
-  mounted() {
-    this.updateGamepads();
+  async mounted() {
+    this.setPresetNameList();
+
+    await this.updateGamepads();
     // 最初の要素を選択
     window.addEventListener("gamepadconnected", this.updateGamepads);
     window.addEventListener("gamepaddisconnected", this.updateGamepads);
@@ -381,10 +338,17 @@ export default defineComponent({
           buttonFileData: [],
           initialFrameCount: 1,
           isFreeze: true,
-          backgroudColor: store.state.backgroundColor,
           triggerFrameReset: false,
         };
       }
+    );
+
+    // キー入力ハンドラを初期化
+    this.inputStreamHandler = new DisplayButtonHandler(
+      this.inputHistoryDisplayType,
+      this.buttonPictSetting,
+      this.direction_image,
+      this.dropdown_images
     );
   },
   beforeUnmount() {
