@@ -154,7 +154,7 @@ export default defineComponent({
       class="keyinput-container-horizontal d-flex flex-column align-items-center"
     >
       <!-- 方向キー表示 -->
-      <div class="mt-1" v-if="directionFileData">
+      <div class="" v-if="directionFileData">
         <img :src="directionFileData" class="keyinput-direction-img" />
       </div>
       <!-- ボタン表示 -->
@@ -216,8 +216,8 @@ export default defineComponent({
 }
 
 .keyinput-direction-img {
-  width: 28px;
-  height: 28px;
+  width: 30px;
+  height: 30px;
 }
 .keyinput-button-img {
   width: 30px;
