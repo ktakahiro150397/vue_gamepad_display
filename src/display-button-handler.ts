@@ -125,6 +125,11 @@ export class DisplayButtonHandler {
 
         const ret = [] as any;
 
+        if (this.previous_direction_state != 5 && data.direction_state === 5) {
+            // ニュートラルに戻った場合、前回の方向キー情報を削除
+            this.previous_direction_state = 5;
+        }
+
         // 方向キーの割当
         if (this.previous_direction_state != data.direction_state && data.direction_state !== 5) {
             this.previous_direction_state = data.direction_state;
