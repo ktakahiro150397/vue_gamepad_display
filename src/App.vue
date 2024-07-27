@@ -29,4 +29,13 @@ export default defineComponent({
   /* text-align: center; */
   color: #2c3e50;
 }
+
+a[target="_blank"]:hover {
+  background-color: rgb(233, 233, 233);
+}
+
+a[target="_blank"] {
+  padding: 0.3rem;
+  border-radius: 0.5rem;
+}
 </style>

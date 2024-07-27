@@ -23,15 +23,15 @@ export default defineComponent({
     </div>
 
     <div>
-      <h2>アプリケーション開発</h2>
-      <p>開発者本人 / なんでも作るので雇ってください。</p>
-      <div class="d-flex gap-2">
+      <h2>ktakahiro150397</h2>
+      <p>アプリケーション開発者本人 / なんでも作るので雇ってください。</p>
+      <div class="d-flex gap-1 align-items-center">
         <i class="bi bi-github"></i>
         <a :href="applicationDeveloperUrl" target="_blank">{{
           applicationDeveloperUrl
         }}</a>
       </div>
-      <div class="d-flex gap-2">
+      <div class="d-flex gap-1 align-items-center">
         <i class="bi bi-twitter"></i>
         <a :href="applicationDeveloperXUrl" target="_blank">{{
           applicationDeveloperXUrl
