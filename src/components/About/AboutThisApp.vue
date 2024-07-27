@@ -38,14 +38,3 @@ export default defineComponent({
     </p>
   </div>
 </template>
-
-<style scoped>
-.nav-item a:hover {
-  cursor: pointer;
-  background-color: lightgrey;
-}
-
-.nav-item .contentActive {
-  font-weight: bold;
-}
-</style>
