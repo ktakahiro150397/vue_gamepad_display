@@ -1,5 +1,5 @@
 <script lang="tsx">
-import { PropType, defineComponent, createApp } from "vue";
+import { PropType, defineComponent, createApp, ref } from "vue";
 import GamepadKeyInputInfo from "@/input-info";
 import KeyInputElement from "./KeyInputElement.vue";
 import { ButtonPictSetting } from "@/button-pict-setting";
@@ -34,9 +34,15 @@ export default defineComponent({
       inputInfo: new GamepadKeyInputInfo(),
 
       buttonPictSetting: new ButtonPictSetting("", "", ""),
+      latestInputHistoryProperty: {
+        directionFileData: "",
+        buttonFileData: [],
+        initialFrameCount: 1,
+        isFreeze: false,
+        backgroudColor: store.state.backgroundColor,
+        triggerFrameReset: false,
+      },
       inputHistoryPropertyList: [] as any,
-      topKeyIndexValue: ["a", "b"],
-      topKeyIndex: false,
 
       dropdown_images: [] as DropdownImage[],
       direction_image: [] as DropdownImage[],
@@ -99,21 +105,6 @@ export default defineComponent({
         }
       );
     },
-    // generateDomId(): string {
-    //   // const date = new Date();
-
-    //   // const year = date.getFullYear();
-    //   // const month = String(date.getMonth() + 1).padStart(2, "0");
-    //   // const day = String(date.getDate()).padStart(2, "0");
-    //   // const hours = String(date.getHours()).padStart(2, "0");
-    //   // const minutes = String(date.getMinutes()).padStart(2, "0");
-    //   // const seconds = String(date.getSeconds()).padStart(2, "0");
-    //   // const milliseconds = String(date.getMilliseconds()).padStart(3, "0");
-
-    //   // return `${year}${month}${day}${hours}${minutes}${seconds}${milliseconds}`;
-
-    //   return this.generateGUID();
-    // },
     onChangeGamepadSelection() {
       this.setPresetNameList();
 
@@ -262,41 +253,28 @@ export default defineComponent({
         return 0;
       });
 
-      const componentElement = {
-        type: "KeyInputElement",
-        props: {
-          directionFileData: directionFileData,
-          buttonFileData: buttonFileDataList.map(
-            (element: any) => element.fileData
-          ),
-          initialFrameCount: 1,
-          isFreeze: false,
-          //domId: this.generateDomId(),
-          backgroudColor: store.state.backgroundColor,
-        },
-      };
-
-      const options = {
+      // 最新の入力情報
+      const latestInput = {
         directionFileData: directionFileData,
         buttonFileData: buttonFileDataList.map(
           (element: any) => element.fileData
         ),
         initialFrameCount: 1,
         isFreeze: false,
-        //domId: this.generateDomId(),
         backgroudColor: store.state.backgroundColor,
-        // index: this.topKeyIndex
-        //   ? this.topKeyIndexValue[0]
-        //   : this.topKeyIndexValue[1],
+        index: -1,
+        triggerFrameReset: !this.latestInputHistoryProperty.triggerFrameReset,
       };
 
-      this.topKeyIndex = !this.topKeyIndex;
+      // 現在の最新入力情報を履歴として追加
+      var addHistoryData = this.latestInputHistoryProperty;
+      addHistoryData.isFreeze = true;
+      this.inputHistoryPropertyList.unshift(addHistoryData);
 
-      // 既存のインスタンスのisFreezeをtrueにする
-      // インデックスを割り当てる
+      // 現在の最新入力情報を設定
       this.inputHistoryPropertyList.forEach((element: any, index: number) => {
-        element.isFreeze = true;
-        element.index = index;
+        element.isFreeze = true; // 既存のインスタンスのisFreezeをtrueにする
+        element.index = index; // インデックスを割り当てる
       });
 
       // 直前の入力情報にフレーム数を設定
@@ -305,11 +283,14 @@ export default defineComponent({
           data.previous_push_frame;
       }
 
-      // プロパティを末尾に追加
-      this.inputHistoryPropertyList.unshift(options);
+      // 最新入力情報を反映
+      this.latestInputHistoryProperty = latestInput;
 
-      // 制限数を超えている分を削除
-      while (this.inputHistoryPropertyList.length > this.displayHistoryCount) {
+      // 制限数を超えている分の履歴データを削除
+      while (
+        this.inputHistoryPropertyList.length >
+        this.displayHistoryCount - 1
+      ) {
         this.inputHistoryPropertyList.pop();
       }
     },
@@ -385,6 +366,10 @@ export default defineComponent({
       const fileData = context_direction(key);
       return new DropdownImage(fileName, fileData);
     });
+
+    // 初期入力表示をニュートラルに設定
+    this.latestInputHistoryProperty.directionFileData =
+      this.direction_image[5 - 1].fileData;
   },
   beforeUnmount() {
     window.removeEventListener("gamepadconnected", this.updateGamepads);
@@ -461,7 +446,6 @@ export default defineComponent({
       <hr class="horizontal-line" />
 
       <!-- 横並び -->
-
       <div v-if="isDisplayHorizontal" class="d-flex align-items-end gap-2 ms-3">
         <div
           v-for="inputHistoryProperty in inputHistoryPropertyList"
@@ -473,7 +457,6 @@ export default defineComponent({
             :initialFrameCount="inputHistoryProperty['initialFrameCount']"
             :isFreeze="inputHistoryProperty['isFreeze']"
             :backgroundColor="inputHistoryProperty['backgroudColor']"
-            ref="keyInputElement"
           />
         </div>
       </div>
@@ -481,21 +464,23 @@ export default defineComponent({
       <!-- 縦並び -->
       <div v-else class="px-5 py-3">
         <!-- リアルタイムフレームカウントする要素 -->
-        <!-- <div :style="borderStyle">
+        <div :style="borderStyle">
           <i class="bi bi-circle-fill" :style="borderIconStyle"></i>
           <KeyInputElement
-            :directionFileData="inputHistoryProperty['directionFileData']"
-            :buttonFileData="inputHistoryProperty['buttonFileData']"
-            :initialFrameCount="inputHistoryProperty['initialFrameCount']"
-            :isFreeze="inputHistoryProperty['isFreeze']"
-            :backgroundColor="inputHistoryProperty['backgroudColor']"
-            ref="keyInputElement"
+            :directionFileData="
+              this.latestInputHistoryProperty['directionFileData']
+            "
+            :buttonFileData="this.latestInputHistoryProperty['buttonFileData']"
+            :initialFrameCount="
+              this.latestInputHistoryProperty['initialFrameCount']
+            "
+            :isFreeze="this.latestInputHistoryProperty['isFreeze']"
+            :backgroundColor="this.latestInputHistoryProperty['backgroudColor']"
+            :triggerFrameReset="
+              this.latestInputHistoryProperty['triggerFrameReset']
+            "
           />
-
-          <span>{{ inputHistoryProperty.index }}</span> /
-          <span>{{ inputHistoryProperty["initialFrameCount"] }}</span> /
-          <span>{{ inputHistoryProperty["isFreeze"] }}</span>
-        </div> -->
+        </div>
 
         <div
           :style="borderStyle"
@@ -504,17 +489,12 @@ export default defineComponent({
         >
           <i class="bi bi-circle-fill" :style="borderIconStyle"></i>
           <KeyInputElement
-            v-if="inputHistoryProperty"
             :directionFileData="inputHistoryProperty['directionFileData']"
             :buttonFileData="inputHistoryProperty['buttonFileData']"
             :initialFrameCount="inputHistoryProperty['initialFrameCount']"
             :isFreeze="inputHistoryProperty['isFreeze']"
             :backgroundColor="inputHistoryProperty['backgroudColor']"
           />
-
-          <span>{{ inputHistoryProperty.index }}</span> /
-          <span>{{ inputHistoryProperty["initialFrameCount"] }}</span> /
-          <span>{{ inputHistoryProperty["isFreeze"] }}</span>
         </div>
       </div>
     </div>
