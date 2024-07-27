@@ -10,6 +10,7 @@ export class DisplayButtonHandler {
     public direction_image: DropdownImage[];
 
     private previous_direction_state = 5;
+    private previous_button_fileName = [] as string[];
 
     constructor(inputHistoryDisplayType: KeyHistoryDisplayType, buttonPictSetting: ButtonPictSetting, direction_image: DropdownImage[], dropdown_images: DropdownImage[]) {
         this.inputHistoryDisplayType = inputHistoryDisplayType;
@@ -125,6 +126,11 @@ export class DisplayButtonHandler {
 
         const ret = [] as any;
 
+        if (this.previous_direction_state != 5 && data.direction_state === 5) {
+            // ニュートラルに戻った場合、前回の方向キー情報を削除
+            this.previous_direction_state = 5;
+        }
+
         // 方向キーの割当
         if (this.previous_direction_state != data.direction_state && data.direction_state !== 5) {
             this.previous_direction_state = data.direction_state;
@@ -181,15 +187,21 @@ export class DisplayButtonHandler {
 
         // ボタンごとにプロパティを追加
         for (let i = 0; i < buttonFileDataList.length; i++) {
-            ret.push({
-                directionFileData: "",
-                buttonFileData: [buttonFileDataList[i].fileData],
-                initialFrameCount: 1,
-                isFreeze: false,
-                index: -1,
-                triggerFrameReset: false,
-            });
+            // 前回と異なるボタンが押された場合、ボタン情報を追加
+            if (!this.previous_button_fileName.includes(buttonFileDataList[i].fileName)) {
+                ret.push({
+                    directionFileData: "",
+                    buttonFileData: [buttonFileDataList[i].fileData],
+                    initialFrameCount: 1,
+                    isFreeze: false,
+                    index: -1,
+                    triggerFrameReset: false,
+                });
+            }
         }
+
+        // 前回押下ボタンの情報を更新
+        this.previous_button_fileName = buttonFileDataList.map((element: any) => element.fileName);
 
         return ret;
     }

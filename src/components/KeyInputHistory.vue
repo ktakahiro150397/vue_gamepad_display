@@ -516,7 +516,7 @@ export default defineComponent({
 
       <div
         v-if="inputHistoryDisplayType === 2"
-        class="d-flex flex-row-reverse justify-content-end align-items-end gap-2 ms-3"
+        class="d-flex flex-row-reverse justify-content-end align-items-end ms-3 mt-5"
       >
         <!-- RTA形式 -->
         <!-- リアルタイムフレームカウント要素 -->
