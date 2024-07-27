@@ -30,7 +30,7 @@ export default defineComponent({
                 :class="{ contentActive: currentTab === 'AboutThisApp' }"
                 @click="currentTab = 'AboutThisApp'"
               >
-                <span data-feather="home"></span>
+                <i class="bi bi-joystick"></i>
                 このアプリについて
               </a>
             </li>
@@ -40,8 +40,8 @@ export default defineComponent({
                 :class="{ contentActive: currentTab === 'Contribution' }"
                 @click="currentTab = 'Contribution'"
               >
-                <span data-feather="home"></span>
-                コントリビューション
+                <i class="bi bi-github"></i>
+                GitHub
               </a>
             </li>
           </ul>
