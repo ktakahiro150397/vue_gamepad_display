@@ -22,9 +22,9 @@ export default {
 <template>
   <div class="container-fluid">
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
-      <a class="navbar-brand" @click="currentTab = 'KeyInputHistory'"
-        >キー入力履歴表示サイト</a
-      >
+      <!-- <a class="navbar-brand" @click="currentTab = 'KeyInputHistory'"
+        >キー入力表示アプリ</a
+      > -->
       <!-- レスポンシブなバー -->
       <!-- <button
         class="navbar-toggler"
