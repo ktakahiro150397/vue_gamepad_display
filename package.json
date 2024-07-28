@@ -1,6 +1,8 @@
 {
-  "name": "vue_gamepad_display",
-  "version": "0.1.0",
+  "name": "gamepad_input_display",
+  "version": "0.0.1",
+  "description": "ゲームパッド入力をリアルタイムに表示します。",
+  "author": "ktakahiro150397",
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
@@ -8,6 +10,7 @@
     "test:unit": "vue-cli-service test:unit",
     "lint": "vue-cli-service lint",
     "electron:build": "vue-cli-service electron:build",
+    "electron:buildwin": "vue-cli-service electron:build --win",
     "electron:serve": "vue-cli-service electron:serve",
     "postinstall": "electron-builder install-app-deps",
     "postuninstall": "electron-builder install-app-deps"
