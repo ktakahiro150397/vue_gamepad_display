@@ -4,6 +4,8 @@ import KeyInputHistory from "./KeyInputHistory.vue";
 import About from "./About/About.vue";
 import ButtonSettings from "./Settings/ButtonSettings.vue";
 
+import { ipcRenderer } from 'electron';
+
 export default {
   components: {
     SiteSettings,
@@ -16,6 +18,11 @@ export default {
       currentTab: "KeyInputHistory",
     };
   },
+  async mounted() {
+    // test
+    var getPath = await ipcRenderer.invoke("get-path","exe");
+    console.log("path=",getPath);
+  }
 };
 </script>
 

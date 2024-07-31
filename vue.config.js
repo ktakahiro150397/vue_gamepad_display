@@ -15,6 +15,7 @@ module.exports = defineConfig({
   },
   pluginOptions: {
     electronBuilder: {
+      nodeIntegration: true,
       builderOptions: {
         appId: 'net.yanelmo.gamepad_input_display',
         win: {
