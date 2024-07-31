@@ -5,6 +5,7 @@ import About from "./About/About.vue";
 import ButtonSettings from "./Settings/ButtonSettings.vue";
 
 import { ipcRenderer } from 'electron';
+import * as path from 'path';
 
 export default {
   components: {
@@ -21,7 +22,10 @@ export default {
   async mounted() {
     // test
     var getPath = await ipcRenderer.invoke("get-path","exe");
-    console.log("path=",getPath);
+    console.log("exe path=",getPath);
+
+    const exeDir = path.dirname(getPath);
+    console.log("exe dir=",exeDir);
   }
 };
 </script>
