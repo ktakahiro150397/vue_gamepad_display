@@ -43,3 +43,19 @@ export class ButtonPictSettingData {
         this.pictFileNames.push("");
     }
 }
+
+export function loadButtonPicFromAsset(exeDir: string): DropdownImage[] {
+    const ret = [] as DropdownImage[];
+
+    // assets/button_promptディレクトリ内のpngファイルをインポート
+    const context_asset = require.context("@/assets/button_prompt", true, /\.png$/);
+    ret.push(...context_asset.keys().map((key) => {
+        const fileName = key;
+        const fileData = context_asset(key);
+        return new DropdownImage(fileName, fileData);
+    }));
+
+    // TODO : exeDir/assets/button_promptディレクトリ内のpngファイルをインポート
+
+    return ret;
+}

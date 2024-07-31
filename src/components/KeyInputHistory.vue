@@ -2,7 +2,7 @@
 import { PropType, defineComponent, createApp, ref } from "vue";
 import GamepadKeyInputInfo from "@/input-info";
 import KeyInputElement from "./KeyInputElement.vue";
-import { ButtonPictSetting } from "@/button-pict-setting";
+import { ButtonPictSetting, loadButtonPicFromAsset } from "@/button-pict-setting";
 import { DropdownImage } from "@/button-pict-setting";
 import store from "@/store";
 import { KeyHistoryDisplayType } from "@/display-type";
@@ -329,16 +329,18 @@ export default defineComponent({
     }
 
     // assets/button_promptディレクトリ内のpngファイルをインポート
-    const context = require.context("@/assets/button_prompt", true, /\.png$/);
+    this.dropdown_images = loadButtonPicFromAsset("");
+    console.log("this.dropdown_images",this.dropdown_images);
+    // const context = require.context("@/assets/button_prompt", true, /\.png$/);
 
     // インポートしたファイルのファイル名をdropdown_images配列に格納
-    this.dropdown_images = context.keys().map((key) => {
-      const fileName = key;
-      const fileData = context(key);
-      return new DropdownImage(fileName, fileData);
-    });
-
-    // assets/button_promptディレクトリ内のpngファイルをインポート
+    // this.dropdown_images = context.keys().map((key) => {
+    //   const fileName = key;
+    //   const fileData = context(key);
+    //   return new DropdownImage(fileName, fileData);
+    // });
+    
+    // assets/directionディレクトリ内のpngファイルをインポート
     const context_direction = require.context(
       "@/assets/direction",
       true,
