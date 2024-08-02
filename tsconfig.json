@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
-    "target": "esnext",
-    "module": "esnext",
+    "target": "ES6",
+    "module": "ES6",
     "strict": true,
     "jsx": "preserve",
     "moduleResolution": "node",
@@ -33,8 +33,9 @@
     "src/**/*.tsx",
     "src/**/*.vue",
     "tests/**/*.ts",
-    "tests/**/*.tsx"
-, "src/image-selector.js"  ],
+    "tests/**/*.tsx",
+    "src/image-selector.js"
+  ],
   "exclude": [
     "node_modules"
   ]

@@ -3,7 +3,12 @@
 import { app, protocol, BrowserWindow, ipcMain } from 'electron'
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
 import installExtension, { VUEJS3_DEVTOOLS } from 'electron-devtools-installer'
+import * as path from 'path';
+import * as fs from 'fs';
+import { DropdownImage } from './button-pict-setting';
+
 const isDevelopment = process.env.NODE_ENV !== 'production'
+
 
 // Scheme must be registered before the app is ready
 protocol.registerSchemesAsPrivileged([
@@ -37,6 +42,32 @@ async function createWindow() {
 
   ipcMain.handle("get-path", (event, name) => {
     return app.getPath(name);
+  })
+
+  ipcMain.handle("get-user-button-pict-setting", async (event) => {
+    const exeDir = app.getPath('exe');
+    const assetsDir = path.join(path.dirname(exeDir), 'assets', 'button_prompt');
+
+    // Check if the directory exists
+    if (!fs.existsSync(assetsDir)) {
+      console.log(`Directory ${assetsDir} does not exist`);
+      return [];
+    }
+    console.log(`Directory ${assetsDir} exists`);
+
+
+    const files = fs.readdirSync(assetsDir);
+    const pngFiles = files.filter(file => path.extname(file).toLowerCase() === '.png');
+
+    const result: DropdownImage[] = pngFiles.map(file => {
+      const filePath = path.join(assetsDir, file);
+      const relativePath = path.relative(exeDir, filePath);
+      const fileBuffer = fs.readFileSync(filePath);
+      const base64String = fileBuffer.toString('base64');
+      return new DropdownImage(relativePath, base64String);
+    });
+
+    return result;
   })
 }
 

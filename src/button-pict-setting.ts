@@ -1,3 +1,5 @@
+import { ipcRenderer } from 'electron';
+
 export class DropdownImage {
     public fileName: string;
     public fileData: string;
@@ -44,7 +46,7 @@ export class ButtonPictSettingData {
     }
 }
 
-export function loadButtonPicFromAsset(exeDir: string): DropdownImage[] {
+export async function loadButtonPicFromAsset(exeDir: string): Promise<DropdownImage[]> {
     const ret = [] as DropdownImage[];
 
     // assets/button_promptディレクトリ内のpngファイルをインポート
@@ -56,6 +58,10 @@ export function loadButtonPicFromAsset(exeDir: string): DropdownImage[] {
     }));
 
     // TODO : exeDir/assets/button_promptディレクトリ内のpngファイルをインポート
+    const result = await ipcRenderer.invoke("get-user-button-pict-setting");
+    console.log(result);
+
+    ret.push(...result);
 
     return ret;
 }

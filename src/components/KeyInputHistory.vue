@@ -15,6 +15,7 @@ import {
 
 import { useToast } from "vue-toast-notification";
 import "vue-toast-notification/dist/theme-sugar.css";
+import { ipcRenderer } from 'electron';
 
 export default defineComponent({
   name: "KeyInputHistory",
@@ -300,7 +301,7 @@ export default defineComponent({
       };
     },
   },
-  mounted() {
+  async mounted()  {
     this.setPresetNameList();
 
     this.updateGamepads();
@@ -329,7 +330,8 @@ export default defineComponent({
     }
 
     // assets/button_promptディレクトリ内のpngファイルをインポート
-    this.dropdown_images = loadButtonPicFromAsset("");
+    console.log("get-path", await ipcRenderer.invoke("get-path","exe"));
+    this.dropdown_images = await loadButtonPicFromAsset("");
     console.log("this.dropdown_images",this.dropdown_images);
     // const context = require.context("@/assets/button_prompt", true, /\.png$/);
 
